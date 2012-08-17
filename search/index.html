@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+  <title>Pancake: Search Results</title>
+  <!--link rel="apple-touch-icon" href="images/icon.png?v={{v}}"/ -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <script type="text/javascript">
+    // Replace `no-js` class with `js` class. Useful for preventing flash
+    // of unscripted content accessibly.
+    var h = document.getElementsByTagName('html')[0];
+    h.className = h.className.replace('no-js', 'js');
+  </script>
+  <style>
+    body { margin: 1em; }
+  </style>
+</head>
+<body>
+<section id="topbar">
+  <input type="text" placeholder="Search for..." value=""/>
+  <p>search bar w. suggestions (populated w. search terms)</p>
+</section>
+<section id="your_results">
+  <h1>Your stuff</h1>
+  <ul>
+    <li>[stack]</li>
+    <li>[stack]</li>
+    <li>[stack]</li>
+  </ul>
+</section>
+<section id="others_results">
+  <h1>Other people's stuff</h1>
+  <ul>
+    <li>[stack]</li>
+    <li>[stack]</li>
+    <li>[stack]</li>
+  </ul>
+</section>
+<section id="web_results">
+  <h1>Web results</h1>
+  <ul>
+    <li>Site title and text</li>
+    <li>Site title and text</li>
+    <li>Site title and text</li>
+  </ul>
+  <h2>Suggestions</h2>
+</section>
+
+<nav id="sidebar">
+  <ul>
+    <li>[list]</li>
+    <li>[profile]</li>
+    <li>[people]</li>
+    <li>[world]</li>
+    <li>[pins]</li>
+    <li>[photos]</li>
+  </ul>
+</nav>
+
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+<script type="text/javascript">
+  var config = {
+    thumbnailerStatus: "{{thumbnailer_status_url}}?job={jobId}",
+    thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
+    latticeRoot: "/lattice",
+    latticeUrl: "{latticeRoot}/{username}/{service}/{method}",
+    // Set reference to index of app
+    applicationRoot: "/",
+    appVersion: "{{js_app_version}}",
+    apiRoot: "/api/", 
+    searchRoot: "{{search_url}}",
+    searchResults: "http://"+ location.host +"/searchresult?query={?query?}&provider={provider}",
+    logging: "{{logging}}",
+    social: {
+      twitter: {
+        service_url: "http://twitter.com"
+      },
+      facebook: {
+        service_url: "http://facebook.com"
+      }
+    },
+    analyticsUrl: "/lattice/stats",
+    exceptionsUrl: "/lattice/exceptions",
+    packages: {
+      // package mappings
+      $: './vendor/zepto',
+      underscore: './vendor/underscore',
+      backbone: './vendor/backbone',
+      json: './lib/json',
+      text: 'vendor/plugin/text',
+      order: 'vendor/plugin/order'
+    },
+    // UTC timestamp 
+    pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
+  };
+  // some browser shims
+  config.platform = 'web';
+  config.packages.verifiedemail = 'lib/verifiedemail.browser';
+  config.packages.xmessage = 'lib/xmessage.browser';
+  // Use the browser logger in the browser environment.
+  config.packages.logger = 'lib/logger.browser';
+</script>
+
+
+<script src="../js/vendor/requirejs.js?v={{v}}"></script>
+<script>
+  config.appName = "main";
+  console.log("bootstrapping for platform: ", config.platform, config);
+  require({
+    // configure our AMD loader
+    baseUrl: '../js',
+    paths: config.packages,
+    waitSeconds: 20,
+    urlArgs: "r={{v}}" // r is a cache-busting token
+  }, ['search.app']);
+</script>
+
+</body>
+</html>
