@@ -13,8 +13,24 @@ define([
 
   function dataToViewModel(data){
     // util.defaults(data, proto);
-    var viewModel = ko.mapping.fromJS(data);
+    // FIXME: ko.mapping is not defined? 
+    // var viewModel = ko.mapping.fromJS(data);
+    var viewModel = data;
     return viewModel;
+  }
+
+  function successHandler(rows) {
+    return function(results){
+      if('string' == typeof results) {
+        results = JSON.parse(results);
+      }
+      var len = ('function' == typeof rows) ? rows().length : rows.length;
+      // rows is observable, so splice triggers updates in any bindings
+      rows.splice.apply(
+        rows, 
+        [0, len].concat( results.map( dataToViewModel ) )
+      );
+    };
   }
   
   services.search = Compose.create(services.search || {}, {
@@ -28,11 +44,12 @@ define([
       // need to align ko observables with store observables
       
       $.ajax({
-        url: '/search/user',
-        success: function(results){
-          var len = ('function' == typeof rows) ? rows().length : rows.length;
-          // rows is observable, so splice triggers updates in any bindings
-          rows.splice.apply(rows, [0, len].concat(results.map( dataToViewModel )) );
+        url: '/search/byuser',
+        cache: false,
+        type: 'GET',
+        success: successHandler(rows),
+        error: function(err){
+          console.warn("Error fetching yourResults: ", err);
         }
       });
       
@@ -49,13 +66,11 @@ define([
       
       $.ajax({
         url: '/search/others',
-        success: function(results){
-          var len = ('function' == typeof rows) ? rows().length : rows.length;
-          // rows is observable, so splice triggers updates in any bindings
-          rows.splice.apply(rows, [0, len].concat(results.map( dataToViewModel )) );
-        },
+        cache: false,
+        type: 'GET',
+        success: successHandler(rows),
         error: function(err){
-          console.log("Error fetching theirResults");
+          console.warn("Error fetching theirResults: ", err);
         }
       });
       
@@ -72,13 +87,11 @@ define([
       
       $.ajax({
         url: '/search/web',
-        success: function(results){
-          var len = ('function' == typeof rows) ? rows().length : rows.length;
-          // rows is observable, so splice triggers updates in any bindings
-          rows.splice.apply(rows, [0, len].concat(results.map( dataToViewModel )) );
-        },
+        cache: false,
+        type: 'GET',
+        success: successHandler(rows),
         error: function(err){
-          console.log("Error fetching theirResults");
+          console.warn("Error fetching webResults: ", err);
         }
       });
       

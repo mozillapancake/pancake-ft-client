@@ -5,9 +5,9 @@ define(['vendor/compose', 'vendor/knockout'], function(Compose, ko){
       
       return this;
     },
-    applyBindings: function(){
+    applyBindings: function(viewModel){
       var selfNode = $(this.el)[0];
-      ko.applyBindings(this, selfNode);
+      ko.applyBindings(viewModel || this, selfNode);
       return this;
     },
     setStore: function(store){
@@ -15,6 +15,8 @@ define(['vendor/compose', 'vendor/knockout'], function(Compose, ko){
       store = this.store = store;
     
       return this;
-    },
+    }
   });
+  
+  return Page;
 });

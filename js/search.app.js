@@ -2,7 +2,9 @@ define(['vendor/compose', 'lib/page', 'services/search'], function(Compose, Page
   console.log("search.app loaded");
   
   // various views, aggregated onto one page
-  var app = Compose.create({});
+  var app = Compose.create(Page, {
+    el: 'body'
+  });
   // page has a lifecycle: initialize, assign store, applyBindings
   
   var viewModel = {
@@ -11,6 +13,6 @@ define(['vendor/compose', 'lib/page', 'services/search'], function(Compose, Page
     webResults:     services.search.webResults()
   };
   
-  // viewModel.applyBindings();
+  app.applyBindings(viewModel);
   
 });

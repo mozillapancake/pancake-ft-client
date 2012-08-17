@@ -23,26 +23,26 @@
 </section>
 <section id="your_results">
   <h1>Your stuff</h1>
-  <ul>
-    <li>[stack]</li>
-    <li>[stack]</li>
-    <li>[stack]</li>
+  <ul id="results_yours" data-bind="foreach: yourResults">
+    <li>
+      <span data-bind="text: title"></span>
+  	</li>
   </ul>
 </section>
 <section id="others_results">
   <h1>Other people's stuff</h1>
-  <ul>
-    <li>[stack]</li>
-    <li>[stack]</li>
-    <li>[stack]</li>
+  <ul id="results_yours" data-bind="foreach: theirResults">
+    <li>
+      <span data-bind="text: title"></span>
+  	</li>
   </ul>
 </section>
 <section id="web_results">
   <h1>Web results</h1>
-  <ul>
-    <li>Site title and text</li>
-    <li>Site title and text</li>
-    <li>Site title and text</li>
+  <ul id="results_web" data-bind="foreach: webResults">
+    <li>
+      <span data-bind="text: title"></span>
+  	</li>
   </ul>
   <h2>Suggestions</h2>
 </section>
