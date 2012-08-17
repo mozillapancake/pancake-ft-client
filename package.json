@@ -18,7 +18,9 @@
       "zepto": "github:madrobby/zepto/v1.0rc1",
       "store": "github:sfoster/amd-store/master",
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
-      "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js"
+      "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
+      "knockout.mapping": "https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.debug.js",
+      "compose": "github:kriszyp/compose/v0.2.2"
     }
   }
 }
