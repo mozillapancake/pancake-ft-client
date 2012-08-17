@@ -1,0 +1,26 @@
+{
+  "name": "amd-store",
+  "id": "amd-store",
+  "version": "0.0.1",
+  "description": "Self-contained data store implementation, ported from dojo/store",
+  "keywords": [
+    "AMD",
+    "store",
+    "REST",
+    "javascript"
+  ],
+  "author": "Sam Foster <sfoster@sneeetchworks.com>",
+  "homepage": "https://github.com/sfoster/amd-store",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sfoster/amd-store.git"
+  },
+  "dependencies": {
+    "express": ">= 1.2.0"
+  },
+  "volo": {},
+  "devDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}

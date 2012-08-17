@@ -1,6 +1,6 @@
 {
   "name": "Pancake 'French Toast' Client",
-  "id": "todo-mvc",
+  "id": "pancake-ft",
   "version": "0.0.1",
   "description": "The front-end piece of the 'French Toast' Pancake application",
   "keywords": [],
@@ -14,10 +14,10 @@
     "baseUrl": "js/vendor",
     "dependencies": {
       "requirejs": "github:jrburke/requirejs/2.0.5",
-      "text": "github:requirejs/text/2.0.2",
+      "text": "github:requirejs/text/2.0.3",
       "zepto": "github:madrobby/zepto/v1.0rc1",
       "store": "github:sfoster/amd-store/master",
-      "lodash": "https://raw.github.com/bestiejs/lodash/v0.5.0-rc.1/lodash.js",
+      "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
       "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js"
     }
   }
