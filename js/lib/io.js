@@ -6,7 +6,7 @@ define([
   '$', 
   'underscore', 
   'lib/registry', 
-  'lib/promise',
+  'promise',
   'lib/io/noNetworkAdapter',
   'logger'
 ], function(

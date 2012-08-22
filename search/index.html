@@ -17,6 +17,7 @@
   </style>
 </head>
 <body>
+<header data-bind="text: user.username"></header>
 <section id="topbar">
   <input type="text" placeholder="Search for..." value=""/>
   <p>search bar w. suggestions (populated w. search terms)</p>
@@ -86,9 +87,11 @@
     exceptionsUrl: "/lattice/exceptions",
     packages: {
       // package mappings
-      $: './vendor/zepto',
       'dollar': './vendor/zepto',
+      'underscore': './vendor/underscore',
       'knockout': './vendor/knockout',
+      'compose': './vendor/compose',
+      'promise': './vendor/store/lib/Promise',
       'json': './lib/json',
       'text': 'vendor/plugin/text'
     },
@@ -104,6 +107,7 @@
 </script>
 
 
+<script src="https://login.persona.org/include.js" type="text/javascript"></script>
 <script src="../js/vendor/requirejs.js?v={{v}}"></script>
 <script>
   config.appName = "main";

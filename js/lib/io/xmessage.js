@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-define(['xmessage', 'lib/uuid', 'lib/promise'], function(xmessage, uuid, Promise){
+define(['xmessage', 'lib/uuid', 'promise'], function(xmessage, uuid, Promise){
   var exports = {};
   var slice = Array.prototype.slice;
 
