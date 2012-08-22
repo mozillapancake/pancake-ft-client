@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pancake: Tester</title>
+</head>
+<body>
+  <div id="container">
+    <header data-bind="text: name"></header>
+  </div>
+
+<script type="text/javascript">
+  var config = {
+    packages: {
+      // package mappings
+      'dollar': './vendor/zepto',
+      'underscore': './vendor/underscore',
+      'knockout': './vendor/knockout',
+      'compose': './vendor/compose',
+      'promise': './vendor/store/lib/Promise',
+      'json': './lib/json',
+      'text': 'vendor/plugin/text'
+    },
+    // UTC timestamp 
+    pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
+  };
+  // some browser shims
+  config.platform = 'web';
+  config.packages.logger = 'lib/logger.browser';
+</script>
+
+<script src="../js/vendor/requirejs.js?v={{v}}"></script>
+<script>
+  config.appName = "main";
+  console.log("bootstrapping for platform: ", config.platform, config);
+  require({
+    // configure our AMD loader
+    baseUrl: '../js',
+    paths: config.packages,
+    waitSeconds: 20,
+    urlArgs: "r={{v}}" // r is a cache-busting token
+  }, ['knockout'], function(ko){
+
+
+
+    function isObservableArray(thing) {
+      return (
+        'function' === typeof thing.valueWillMutate &&
+        'function' === typeof thing &&
+        (thing() instanceof Array)
+      );
+    }
+
+    ko.extenders.reduceWith = function(target, reducerFn) {
+      // target is the original observable array
+      console.log("reduceWith, got target: ", target());
+      
+      // create the observable we'll return and update with the result of the reduce
+      var placeholder = ko.observable();
+      console.log("declared placeholder");
+      
+      function reduceArray(values){
+        console.log("event on original observable target array, arguments are: ", values);
+
+        if(isObservableArray(values)) {
+          console.log("observableArray subscriber was passed an observableArray");
+          values = values();
+        }
+
+        console.log("are these values themselves observables? ", !!values.filter(ko.isObservable));
+        if('function' !== typeof values.reduce){
+          values = [values]
+        }
+
+        // unwrap each observable value
+        var unwrapped = values.map(function(value){
+          return ko.isObservable(value) ? ko.utils.unwrapObservable(value) : value;
+        });
+        console.log("unwrapped ", unwrapped);
+
+        // reduce fn doesn't get called on arrays of 1 unless we call with an initial value
+        var reducerArgs = [reducerFn];
+        if(unwrapped.length == 1) reducerArgs.push('');
+        var reduced = unwrapped.reduce.apply(unwrapped, reducerArgs);
+        placeholder(reduced);
+      }
+
+      ko.observable( reduceArray(target()) );
+      target.subscribe(reduceArray);
+      return placeholder;
+    };
+
+    var nameStream = window.nameStream = ko.observableArray([{ name: "Bob" }, { name: "Dave"}, { name: "Adam"}]);
+    nameStream.subscribe(function(values){
+      console.log("namestream event: ", values );
+    });
+    
+    var nameReducer = function(prev, val, idx){
+      console.log("nameReducer: ", prev, val, idx);
+      // builds a string
+        if(idx === 0){
+            return prev + val.name;
+        } else if('string'!==typeof prev){
+            prev = prev.name;
+        }
+        return prev + ", son of " + val.name;
+    };
+    
+    var viewModel = window.viewModel = {
+      // open: open a stream (e.g. return observable which will be notified of events)
+      // map: pass all values through this function - to returns replaced or transformed same number of values
+      // filter: pass all values through this function - to return none or more values that evaluate to true by the filter fn
+      
+      name: nameStream.extend({ reduceWith: nameReducer })
+    };
+    
+    ko.applyBindings(viewModel, document.getElementById("container"));
+
+  });
+</script>
+
+</body>
+</html>
