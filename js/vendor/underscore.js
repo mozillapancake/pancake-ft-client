@@ -1,3 +1,6 @@
+//Wrapped in an outer function to preserve global this
+(function (root) { var amdExports; define([], function () { (function () {
+
 //     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -1057,3 +1060,10 @@
   };
 
 }).call(this);
+
+
+amdExports = _;
+
+}.call(root));
+    return amdExports;
+}); }(this));
