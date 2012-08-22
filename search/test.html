@@ -6,6 +6,9 @@
 <body>
   <div id="container">
     <header data-bind="text: name"></header>
+    <section>
+      <p># ancestors: <span data-bind="text: ancestorsCount">-</span></p>
+    </section>
   </div>
 
 <script type="text/javascript">
@@ -38,10 +41,10 @@
     paths: config.packages,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['knockout'], function(ko){
+  }, ['knockout', 'underscore'], function(ko, util){
 
-
-
+    console.log("underscore: ", util);
+    
     function isObservableArray(thing) {
       return (
         'function' === typeof thing.valueWillMutate &&
@@ -50,17 +53,28 @@
       );
     }
 
-    ko.extenders.reduceWith = function(target, reducerFn) {
+    ko.extenders.chainWith = function(target, reducerFn) {
+      
+      var placeholder = ko.observable();
+    };
+    ko.extenders.composeWith = function(target, functions) {
       // target is the original observable array
       console.log("reduceWith, got target: ", target());
       
       // create the observable we'll return and update with the result of the reduce
-      var placeholder = ko.observable();
+      var placeholder = ko.observable('');
       console.log("declared placeholder");
       
-      function reduceArray(values){
-        console.log("event on original observable target array, arguments are: ", values);
-
+      // take a copy so we don't change the original ref, which might be reused elsewhere
+      functions = functions.slice(0);
+      // underscore's compose calls our functions in reverse order
+      // me personally, I prefer a left-right chain so its like value = ar.map(fn).map(fn2).map(n3);
+      functions.reverse(); 
+      var composedHandler = util.compose.apply(util, functions);
+      
+      function onTargetChange(values){
+        console.log("event on original observable target array, arguments are: ", values, " this: ", this);
+        
         if(isObservableArray(values)) {
           console.log("observableArray subscriber was passed an observableArray");
           values = values();
@@ -76,16 +90,13 @@
           return ko.isObservable(value) ? ko.utils.unwrapObservable(value) : value;
         });
         console.log("unwrapped ", unwrapped);
-
-        // reduce fn doesn't get called on arrays of 1 unless we call with an initial value
-        var reducerArgs = [reducerFn];
-        if(unwrapped.length == 1) reducerArgs.push('');
-        var reduced = unwrapped.reduce.apply(unwrapped, reducerArgs);
-        placeholder(reduced);
+        
+        var results = composedHandler(unwrapped);
+        placeholder(results);
       }
 
-      ko.observable( reduceArray(target()) );
-      target.subscribe(reduceArray);
+      // ko.observable( reduceArray(target()) );
+      target.subscribe(onTargetChange);
       return placeholder;
     };
 
@@ -96,21 +107,47 @@
     
     var nameReducer = function(prev, val, idx){
       console.log("nameReducer: ", prev, val, idx);
-      // builds a string
-        if(idx === 0){
-            return prev + val.name;
-        } else if('string'!==typeof prev){
-            prev = prev.name;
-        }
-        return prev + ", son of " + val.name;
+      return prev + ", son of " + val;
     };
+    
+    function curryPlucker(key) {
+      return function(values) {
+        return values.map(function(value){ 
+          return value[key]; 
+        });
+      }
+    }
+
+    function logger(name) {
+      return function(values) {
+        console.log(name + " logger: got values: ", values);
+        return values;
+      };
+    }
     
     var viewModel = window.viewModel = {
       // open: open a stream (e.g. return observable which will be notified of events)
       // map: pass all values through this function - to returns replaced or transformed same number of values
       // filter: pass all values through this function - to return none or more values that evaluate to true by the filter fn
       
-      name: nameStream.extend({ reduceWith: nameReducer })
+      name:  nameStream.extend({ 
+        composeWith: [
+          // logger('name field'), 
+          curryPlucker('name'), 
+          function(values) { 
+            return values.reduce(nameReducer);
+          },
+          logger('post-name field') 
+        ] 
+      }),
+      ancestorsCount: nameStream.extend({ 
+        composeWith: [
+          // logger('ancestorsCount field'), 
+          util.tail, 
+          util.size,
+          logger('post-ancestorsCount field') 
+        ]
+      })
     };
     
     ko.applyBindings(viewModel, document.getElementById("container"));
