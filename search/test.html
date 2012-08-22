@@ -53,10 +53,6 @@
       );
     }
 
-    ko.extenders.chainWith = function(target, reducerFn) {
-      
-      var placeholder = ko.observable();
-    };
     ko.extenders.composeWith = function(target, functions) {
       // target is the original observable array
       console.log("reduceWith, got target: ", target());
@@ -70,6 +66,7 @@
       // underscore's compose calls our functions in reverse order
       // me personally, I prefer a left-right chain so its like value = ar.map(fn).map(fn2).map(n3);
       functions.reverse(); 
+      
       var composedHandler = util.compose.apply(util, functions);
       
       function onTargetChange(values){
@@ -93,16 +90,20 @@
         
         var results = composedHandler(unwrapped);
         placeholder(results);
+        return results;
       }
 
-      // ko.observable( reduceArray(target()) );
+      // get the initial values in the placeholder
+      placeholder(onTargetChange( target ));
+      // hook into future changes
       target.subscribe(onTargetChange);
+      
       return placeholder;
     };
 
     var nameStream = window.nameStream = ko.observableArray([{ name: "Bob" }, { name: "Dave"}, { name: "Adam"}]);
     nameStream.subscribe(function(values){
-      console.log("namestream event: ", values );
+      console.log("nameStream event: ", values );
     });
     
     var nameReducer = function(prev, val, idx){
