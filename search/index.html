@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-<header data-bind="text: user.username"></header>
+<header data-bind="text: username()">...</header>
 <section id="topbar">
   <input type="text" placeholder="Search for..." value=""/>
   <p>search bar w. suggestions (populated w. search terms)</p>
@@ -37,6 +37,7 @@
       <span data-bind="text: title"></span>
   	</li>
   </ul>
+  <ul data-bind="foreach: theirResults">
 </section>
 <section id="web_results">
   <h1>Web results</h1>

@@ -2,7 +2,7 @@ define([
   'dollar', 
   'vendor/compose', 
   'services/core', 
-  'vendor/knockout', 
+  'vendor/knockout',
   'vendor/knockout.mapping'
 ], function(
   $, 
