@@ -1,10 +1,17 @@
-define(["./lib/util", "./lib/Promise" /*=====, "./api/Store" =====*/
-], function(lang, Deferred /*=====, Store =====*/){
+define(["lang", "./lib/promise", "knockout" /*=====, "./api/Store" =====*/
+], function(lang, Deferred, ko /*=====, Store =====*/){
 
 // module:
 //		store/Observable
 // summary:
 //		TODOC
+
+function before(originalFn, beforeFn, ctx) {
+	return function(){
+		beforeFn.apply(ctx||this, arguments);
+		return originalFn.apply(ctx||this, arguments);
+	};
+}
 
 var Observable = function(/*Store*/ store){
 	// summary:
@@ -19,7 +26,7 @@ var Observable = function(/*Store*/ store){
 	//		Create a Memory store that returns an observable query, and then log some
 	//		information about that query.
 	//
-	//	|	var store = store.Observable(new store.Memory({
+	//	| var store = store.Observable(new store.Memory({
 	//	|		data: [
 	//	|			{id: 1, name: "one", prime: false},
 	//	|			{id: 2, name: "two", even: true, prime: true},
@@ -27,11 +34,11 @@ var Observable = function(/*Store*/ store){
 	//	|			{id: 4, name: "four", even: true, prime: false},
 	//	|			{id: 5, name: "five", prime: true}
 	//	|		]
-	//	|	}));
-	//	|	var changes = [], results = store.query({ prime: true });
-	//	|	var observer = results.observe(function(object, previousIndex, newIndex){
+	//	| }));
+	//	| var changes = [], results = store.query({ prime: true });
+	//	| var observer = results.observe(function(object, previousIndex, newIndex){
 	//	|		changes.push({previousIndex:previousIndex, newIndex:newIndex, object:object});
-	//	|	});
+	//	| });
 	//
 	//		See the Observable tests for more information.
 
@@ -39,9 +46,11 @@ var Observable = function(/*Store*/ store){
 	// a Comet driven store could directly call notify to notify observers when data has
 	// changed on the backend
 	// create a new instance
-	store = lang.create(store);
+	store = Object.create(store);
 	
 	store.notify = function(object, existingId){
+		// called when a change has been completed against the given object
+		// 'remove' calls will only define existingId
 		revision++;
 		var updaters = queryUpdaters.slice();
 		for(var i = 0, l = updaters.length; i < l; i++){
@@ -51,20 +60,65 @@ var Observable = function(/*Store*/ store){
 	var originalQuery = store.query;
 	store.query = function(query, options){
 		options = options || {};
+		console.log("initial query options: ", options);
 		var results = originalQuery.apply(this, arguments);
+		// our return value - a knockout-js Observable
+		var observedResults = ko.observableArray(results), 
+		    originalSubscribe = observedResults.subscribe;
+		  
+		var registerNotifyListener;
+		
 		if(results && results.forEach){
-			var nonPagedOptions = lang.mixin({}, options);
+			// TODO: reinstate the queryUpdates functionality, 
+			// which allows subscribers to relevant queries to be notified when a store change 
+			// implies a change in the results for a query
+			
+			var nonPagedOptions = lang.extend({}, options);
 			delete nonPagedOptions.start;
 			delete nonPagedOptions.count;
-
+			
+			// we remove the result range params when re-evaluating the query
 			var queryExecutor = store.queryEngine && store.queryEngine(query, nonPagedOptions);
 			var queryRevision = revision;
 			var listeners = [], queryUpdater;
-			results.observe = function(listener, includeObjectUpdates){
-				if(listeners.push(listener) == 1){
+			var updateDetails = {};
+			
+			observedResults.subscribe = function(callback, callbackTarget, event, includeObjectUpdates){
+				// Knockout's observables use a subscribe method to register a callback for any changes to the results
+				//  that callback expects the new value(s) as its first argumen
+			
+				// on the *first call only* , hook up our listener for notifications of changes in the store
+				// we need to make the changes to the observableArray once, and knockout will publish to all subscribers
+				if(listeners.length <= 0) {
+					// we can get notified of changes to a result item as well as the resultset 
+					includeObjectUpdates = includeObjectUpdates || callback.includeObjectUpdates; 
+
+					var listener = function(object, previousIndex, newIndex, resultsArray){
+						updateDetails.object = object; 
+						updateDetails.previousIndex = previousIndex; 
+						updateDetails.newIndex = newIndex;
+
+						// TODO: can use the previousIndex/newIndex to optimize this: maybe we can just push/pop or splice a single item
+						if(options.start || options.count) {
+							console.log("query options: ", options);
+						}
+						// the range of the results we need to end up with: 
+						var rangeStart = options.start || 0, 
+								rangeEnd = options.count || resultsArray.length;
+						
+								// the range of the existing array we need to update
+						var spliceStart = 0, 
+								spliceEnd = Math.max(observedResults().length, resultsArray.length);
+						
+						console.log("Splicing from: %s to %s", spliceStart, spliceEnd, resultsArray.length, resultsArray.slice(rangeStart, rangeEnd));
+						observedResults.splice.apply(observedResults, [spliceStart, spliceEnd].concat(resultsArray.slice(rangeStart, rangeEnd)));
+					};
+					listeners.push(listener);
+					
 					// first listener was added, create the query checker and updater
 					queryUpdaters.push(queryUpdater = function(changed, existingId){
 						Deferred.when(results, function(resultsArray){
+							console.log("queryUpdater: ", changed, existingId);
 							var atEnd = resultsArray.length != options.count;
 							var i, l, listener;
 							if(++queryRevision != revision){
@@ -116,15 +170,25 @@ var Observable = function(/*Store*/ store){
 									(includeObjectUpdates || !queryExecutor || (removedFrom != insertedInto))){
 								var copyListeners = listeners.slice();
 								for(i = 0;listener = copyListeners[i]; i++){
-									listener(changed || removedObject, removedFrom, insertedInto);
+									listener(changed || removedObject, removedFrom, insertedInto, resultsArray);
 								}
 							}
 						});
 					});
+					// end notification listener
 				}
-				var handle = {};
-				// TODO: Remove cancel in 2.0.
-				handle.remove = handle.cancel = function(){
+				
+				// wrap the callback to also pass in the update details to any subcriber to this observable
+				callback = lang.wrap(callback, function(callback, resultsArray){
+					console.log("subscriber callback, updateDetails: ", updateDetails);
+					return callback.call(this, resultsArray, updateDetails);
+				});
+				
+				// ko's subscribable gives back a subscription handle object, with a dispose method
+				// hook into that to do our own cleanup
+				var subscription = originalSubscribe.call(this, callback, callbackTarget, event);
+				
+				subscription.dispose = before(subscription.dispose, function(){
 					// remove this listener
 					var index = listeners.indexOf(listener);
 					if(index > -1){ // check to make sure we haven't already called cancel
@@ -134,11 +198,17 @@ var Observable = function(/*Store*/ store){
 							queryUpdaters.splice(queryUpdaters.indexOf(queryUpdater), 1);
 						}
 					}
-				};
-				return handle;
+				});
+				
+				return subscription;
 			};
 		}
-		return results;
+		Deferred.when(results, function(resultsArray){
+			// put results in there and hook up subscribers when we have them
+			observedResults.splice.apply(observedResults, [0, Math.max(observedResults().length, resultsArray.length)].concat(resultsArray));
+		});
+		console.log("Returning observableArray as results:", observedResults);
+		return observedResults;
 	};
 	var inMethod;
 	function whenFinished(method, action){

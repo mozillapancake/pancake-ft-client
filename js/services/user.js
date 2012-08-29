@@ -9,7 +9,7 @@ define([
   'vendor/knockout.mapping'
 ], function(
   $, 
-  underscore,
+  util,
   Compose, 
   services, 
   signin,
@@ -29,9 +29,9 @@ define([
   var users = ko.observableArray([]); 
   // set up a live resultset that publishes updates to a knockout observable array
   Promise.when(store.query({ type: 'user' }), function(results){
-    results.observe(function(item, removedIdx, insertedIdx){
-      console.log("Updates to users results: ", item, removedIdx, insertedIdx);
-    }, true);
+    results.subscribe(function(){ 
+      console.log("Updates to users results: ", arguments);
+    });
   });
   
   var handleError = function(msg) {
@@ -62,9 +62,10 @@ define([
       }
     });
     
-    results.observe(function(user, insertedIdx, removedIdx){
-      console.log("change to users: ", user, insertedIdx, removedIdx);
-    });
+    results.subscribe(util.extend(function(){
+      console.log("change to username query: ", arguments);
+      // console.log("change to users: ", user, insertedIdx, removedIdx);
+    }, { includeObjectUpdates: true }));
     
     return user;
   };

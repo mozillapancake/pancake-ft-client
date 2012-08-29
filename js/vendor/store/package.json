@@ -18,7 +18,13 @@
   "dependencies": {
     "express": ">= 1.2.0"
   },
-  "volo": {},
+  "volo": {
+    "baseUrl": "vendor",
+    "dependencies": {
+      "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
+      "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js"
+    }
+  },
   "devDependencies": {},
   "engines": {
     "node": "*"

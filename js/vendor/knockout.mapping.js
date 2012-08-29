@@ -1,4 +1,4 @@
-/// Knockout Mapping plugin v2.3.1
+/// Knockout Mapping plugin v2.3.2
 /// (c) 2012 Steven Sanderson, Roy Jacobs - http://knockoutjs.com/
 /// License: MIT (http://www.opensource.org/licenses/mit-license.php)
 (function (factory) {
@@ -9,8 +9,7 @@
 		factory(require("knockout"), exports);
 	} else if (typeof define === "function" && define["amd"]) {
 		// AMD anonymous module with hard-coded dependency on "knockout"
-		console.log("knockout.mapping.js, AMD boilerplate");
-		define(["knockout"], factory);
+		define(["knockout", "exports"], factory);
 	} else {
 		// <script> tag: use the global `ko` object, attaching a `mapping` property
 		factory(ko, ko.mapping = {});
@@ -424,6 +423,7 @@
 				}
 
 				visitedObjects.save(rootObject, mappedRootObject);
+				if (hasUpdateCallback()) return mappedRootObject;
 
 				// For non-atomic types, visit all properties and update recursively
 				visitPropertiesOrArrayEntries(rootObject, function (indexer) {
@@ -770,7 +770,4 @@
 			return findBucket(key).get(key);
 		};
 	};
-	
-	// return the exports (decorated knockout) for the define
-	return exports;
 }));

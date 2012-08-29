@@ -43,6 +43,7 @@ define([
       // as its observable, it should result in updates to all listeners
       // need to align ko observables with store observables
       
+      // placeholder: the store will do this eventually, this method will just be sugar
       $.ajax({
         url: '/search/byuser',
         cache: false,
@@ -96,6 +97,9 @@ define([
       });
       
       return rows;
+    },
+    savedSearches: function(){
+      return services.query({ type: 'search' });
     }
   });
   

@@ -14,6 +14,8 @@ define(['dollar', 'compose', 'knockout', 'lib/knockout.composeWith', 'lib/page',
   console.log("search.app, user is observable? ", ko.isObservable(user));
   console.log("search.app, user has value ", user());
   var viewModel = {
+    latestSearch: ko.observable(''),
+    savedSearches: services.search.savedSearches(),
     yourResults:    services.search.yourResults(),
     theirResults:   services.search.theirResults(),
     webResults:     services.search.webResults(),
@@ -24,7 +26,9 @@ define(['dollar', 'compose', 'knockout', 'lib/knockout.composeWith', 'lib/page',
       }]
     })
   };
-  
+  viewModel.latestSearch.subscribe(function(terms){
+    console.log("latest search:", terms);
+  });
   app.applyBindings(viewModel);
   
 });

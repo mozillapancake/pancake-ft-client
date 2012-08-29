@@ -1,5 +1,5 @@
 /*!
- * Lo-Dash v0.6.1 <http://lodash.com>
+ * Lo-Dash v0.6.0 <http://lodash.com>
  * Copyright 2012 John-David Dalton <http://allyoucanleet.com/>
  * Based on Underscore.js 1.3.3, copyright 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
  * <http://documentcloud.github.com/underscore>
@@ -211,12 +211,14 @@
    * The JS engine in Narwhal will generate the function `function anonymous(){//}`
    * and throw a syntax error.
    *
-   * Avoid comments beginning `@` symbols in IE because they are part of its
-   * non-standard conditional compilation support.
-   * http://msdn.microsoft.com/en-us/library/121hztk3(v=vs.94).aspx
+   * In IE, `@` symbols are part of its non-standard conditional compilation support.
+   * The `@cc_on` statement activates its support while the trailing ` !` induces
+   * a syntax error to exlude it. Compatibility modes in IE > 8 require a space
+   * before the `!` to induce a syntax error.
+   * See http://msdn.microsoft.com/en-us/library/121hztk3(v=vs.94).aspx
    */
   try {
-    var useSourceURL = (Function('//@')(), !window.attachEvent);
+    var useSourceURL = (Function('//@cc_on !')(), true);
   } catch(e){ }
 
   /** Used to identify object classifications that are array-like */
@@ -799,6 +801,51 @@
   }
 
   /**
+   * Checks if a given `value` is an object created by the `Object` constructor
+   * assuming objects created by the `Object` constructor have no inherited
+   * enumerable properties and that there are no `Object.prototype` extensions.
+   *
+   * @private
+   * @param {Mixed} value The value to check.
+   * @param {Boolean} [skipArgsCheck=false] Internally used to skip checks for
+   *  `arguments` objects.
+   * @returns {Boolean} Returns `true` if the `value` is a plain `Object` object,
+   *  else `false`.
+   */
+  function isPlainObject(value, skipArgsCheck) {
+    // avoid non-objects and false positives for `arguments` objects
+    var result = false;
+    if (!(value && typeof value == 'object') || (!skipArgsCheck && isArguments(value))) {
+      return result;
+    }
+    // IE < 9 presents DOM nodes as `Object` objects except they have `toString`
+    // methods that are `typeof` "string" and still can coerce nodes to strings.
+    // Also check that the constructor is `Object` (i.e. `Object instanceof Object`)
+    var ctor = value.constructor;
+    if ((!noNodeClass || !(typeof value.toString != 'function' && typeof (value + '') == 'string')) &&
+        (!isFunction(ctor) || ctor instanceof ctor)) {
+      // IE < 9 iterates inherited properties before own properties. If the first
+      // iterated property is an object's own property then there are no inherited
+      // enumerable properties.
+      if (iteratesOwnLast) {
+        forIn(value, function(objValue, objKey) {
+          result = !hasOwnProperty.call(value, objKey);
+          return false;
+        });
+        return result === false;
+      }
+      // In most environments an object's own properties are iterated before
+      // its inherited properties. If the last iterated property is an object's
+      // own property then there are no inherited enumerable properties.
+      forIn(value, function(objValue, objKey) {
+        result = objKey;
+      });
+      return result === false || hasOwnProperty.call(value, result);
+    }
+    return result;
+  }
+
+  /**
    * Creates a new function that, when called, invokes `func` with the `this`
    * binding of `thisArg` and the arguments (value, index, object).
    *
@@ -957,59 +1004,6 @@
   if (isFunction(/x/)) {
     isFunction = function(value) {
       return toString.call(value) == funcClass;
-    };
-  }
-
-  /**
-   * Checks if a given `value` is an object created by the `Object` constructor
-   * assuming objects created by the `Object` constructor have no inherited
-   * enumerable properties and that there are no `Object.prototype` extensions.
-   *
-   * @private
-   * @param {Mixed} value The value to check.
-   * @param {Boolean} [skipArgsCheck=false] Internally used to skip checks for
-   *  `arguments` objects.
-   * @returns {Boolean} Returns `true` if the `value` is a plain `Object` object,
-   *  else `false`.
-   */
-  function isPlainObject(value, skipArgsCheck) {
-    return value
-      ? value == ObjectProto || (value.__proto__ == ObjectProto && (skipArgsCheck || !isArguments(value)))
-      : false;
-  }
-  // fallback for IE
-  if (!isPlainObject(objectTypes)) {
-    isPlainObject = function(value, skipArgsCheck) {
-      // avoid non-objects and false positives for `arguments` objects
-      var result = false;
-      if (!(value && typeof value == 'object') || (!skipArgsCheck && isArguments(value))) {
-        return result;
-      }
-      // IE < 9 presents DOM nodes as `Object` objects except they have `toString`
-      // methods that are `typeof` "string" and still can coerce nodes to strings.
-      // Also check that the constructor is `Object` (i.e. `Object instanceof Object`)
-      var ctor = value.constructor;
-      if ((!noNodeClass || !(typeof value.toString != 'function' && typeof (value + '') == 'string')) &&
-          (!isFunction(ctor) || ctor instanceof ctor)) {
-        // IE < 9 iterates inherited properties before own properties. If the first
-        // iterated property is an object's own property then there are no inherited
-        // enumerable properties.
-        if (iteratesOwnLast) {
-          forIn(value, function(objValue, objKey) {
-            result = !hasOwnProperty.call(value, objKey);
-            return false;
-          });
-          return result === false;
-        }
-        // In most environments an object's own properties are iterated before
-        // its inherited properties. If the last iterated property is an object's
-        // own property then there are no inherited enumerable properties.
-        forIn(value, function(objValue, objKey) {
-          result = objKey;
-        });
-        return result === false || hasOwnProperty.call(value, result);
-      }
-      return result;
     };
   }
 
@@ -4168,7 +4162,7 @@
    * @memberOf _
    * @type String
    */
-  lodash.VERSION = '0.6.1';
+  lodash.VERSION = '0.6.0';
 
   // assign static methods
   lodash.after = after;

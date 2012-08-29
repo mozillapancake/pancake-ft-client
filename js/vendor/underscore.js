@@ -1,6 +1,3 @@
-//Wrapped in an outer function to preserve global this
-(function (root) { var amdExports; define([], function () { (function () {
-
 //     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -51,10 +48,11 @@
   // Create a safe reference to the Underscore object for use below.
   var _ = function(obj) { return new wrapper(obj); };
 
-  // Export the Underscore object for **Node.js**, with
-  // backwards-compatibility for the old `require()` API. If we're in
-  // the browser, add `_` as a global object via a string identifier,
-  // for Closure Compiler "advanced" mode.
+  // Export the Underscore object for **Node.js** and **"CommonJS"**, with
+  // backwards-compatibility for the old `require()` API. If we're not in
+  // CommonJS, add `_` to the global object via a string identifier for
+  // the Closure Compiler "advanced" mode. Registration as an AMD module
+  // via define() happens at the end of this file.
   if (typeof exports !== 'undefined') {
     if (typeof module !== 'undefined' && module.exports) {
       exports = module.exports = _;
@@ -1059,11 +1057,12 @@
     return this._wrapped;
   };
 
+  // AMD define happens at the end for compatibility with AMD loaders
+  // that don't enforce next-turn semantics on modules.
+  if (typeof define === 'function' && define.amd) {
+    define('underscore', function() {
+      return _;
+    });
+  }
+
 }).call(this);
-
-
-amdExports = _;
-
-}.call(root));
-    return amdExports;
-}); }(this));
