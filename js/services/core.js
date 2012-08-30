@@ -1,4 +1,4 @@
-define(['vendor/store/main', 'underscore'], function(store, util){
+define(['store', 'lang'], function(store, util){
 
   // local proxy for data stored and shared across the application
   // could be seeded from localStorage

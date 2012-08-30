@@ -4,7 +4,7 @@
 
 define([
   '$', 
-  'underscore', 
+  'lang', 
   'lib/registry', 
   'promise',
   'lib/io/noNetworkAdapter',

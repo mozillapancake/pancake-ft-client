@@ -1,4 +1,4 @@
-define(['underscore', 'knockout'], function(util, ko){
+define(['lang', 'knockout'], function(util, ko){
 
   function isObservableArray(thing) {
     return (

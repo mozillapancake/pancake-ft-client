@@ -1,12 +1,12 @@
 define([
   'dollar', 
-  'underscore', 
+  'lang', 
   'compose', 
   'services/core', 
   'lib/signin', 
   'promise', 
   'knockout', 
-  'vendor/knockout.mapping'
+  'knockout/mapping'
 ], function(
   $, 
   util,
