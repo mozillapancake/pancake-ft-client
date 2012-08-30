@@ -17,16 +17,17 @@
   </style>
 </head>
 <body>
-<header data-bind="text: username()">...</header>
+<header>Welcome <span data-bind="text: username()">...</span></header>
 <section id="topbar">
-  <input type="text" placeholder="Search for..." data-bind="value: latestSearch()"/>
-  Saved searches:
+  <input type="text" data-placeholder="Search for..." data-bind="value: latestSearch"/><button>Go</button>
+
+  <p>Saved searches:</p>
   <ul data-bind="foreach: savedSearches">
     <li>
       <span data-bind="text: title"></span>
   	</li>
   </ul>
-  <p>search bar w. suggestions (populated w. search terms)</p>
+  <p>[search bar w. suggestions (populated w. search terms)]</p>
 </section>
 <section id="your_results">
   <h1>Your stuff</h1>

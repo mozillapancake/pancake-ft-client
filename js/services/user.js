@@ -1,7 +1,7 @@
 define([
   'dollar', 
   'underscore', 
-  'vendor/compose', 
+  'compose', 
   'services/core', 
   'lib/signin', 
   'promise', 

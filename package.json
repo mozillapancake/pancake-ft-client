@@ -18,7 +18,7 @@
       "text": "github:requirejs/text/2.0.3",
       "zepto": "github:madrobby/zepto/v0.8",
       "store": "github:sfoster/amd-store/knockout-js",
-      "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
+      "knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js",
       "knockout.mapping": "https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.debug.js",
       "compose": "github:kriszyp/compose/v0.2.2",
       "underscore": "github:amdjs/underscore/1.3.3"

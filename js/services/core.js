@@ -30,7 +30,7 @@ define(['vendor/store/main', 'underscore'], function(store, util){
   var dataStore = store.Observable(new store.Memory({
     data: storeData
   }));
-
+  
   // settings shorthand
   dataStore.settings = function(){
     console.warn("dataStore.settings: TODO"); 

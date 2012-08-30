@@ -1,4 +1,4 @@
-define(['vendor/compose', 'vendor/knockout'], function(Compose, ko){
+define(['compose', 'knockout'], function(Compose, ko){
 
   var Page = Compose(Compose, {
     initialize: function(options){

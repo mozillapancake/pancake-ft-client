@@ -1,7 +1,6 @@
-define(['dollar', 'compose', 'knockout', 'lib/knockout.composeWith', 'lib/page', 'services/search', 'services/user'], function($, Compose, ko, koComposeWith, Page, services){
+define(['dollar', 'knockout', 'compose', 'lib/page', 'services/search', 'services/user', 'lib/knockout.composeWith'], function($, ko, Compose, Page, services){
   console.log("search.app loaded");
-  // console.assert(window.KO_M === ko);
-  
+
   // various views, aggregated onto one page
   var app = Compose.create(Page, {
     el: 'body'
