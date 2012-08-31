@@ -9,7 +9,7 @@ function JsonRest(options) {
 	// summary:
 	//		This is a basic store for RESTful communicating with a server through JSON
 	//		formatted data.
-	// options: dojo/store/JsonRest
+	// options: store/JsonRest
 	//		This provides any configuration information that will be mixed into the store
 	this.headers = {};
 	lang.mixin(this, options);

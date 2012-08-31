@@ -4,7 +4,7 @@
 
 define([
   'dollar', 
-  './Promise'
+  'promise'
 ], function(
   $, 
   Promise

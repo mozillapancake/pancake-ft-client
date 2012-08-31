@@ -95,12 +95,12 @@
     exceptionsUrl: "/lattice/exceptions",
     paths: {
       'promise': './vendor/store/lib/Promise',
+      'dollar': './vendor/zepto',
       'json': './lib/json',
-      'text': 'vendor/plugin/text'
+      'text': './vendor/plugin/text'
     },
     packages: [
       // package mappings
-      { name: 'dollar',   location: './vendor/dollar',    main: 'zepto' },
       { name: 'store',   location: './vendor/store',      main: 'main' },
       { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
       { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },

@@ -10,18 +10,23 @@
     "url": "https://github.com/sfoster/pancake-ft-client",
     "web": "https://github.com/sfoster/pancake-ft-client"
   },
-  "volo": {
+  "volo-backup": {
+    "note": "Seems `volo add` doesn't like this layout scheme. If we can get the kinks out, then it will be as simple add `volo add -f` to pull in all the latest client-side dependencies. Until then, js/vendor is managed manually and checked into the repo",
     "baseUrl": "js/vendor",
     "amd": {},
     "dependencies": {
       "requirejs": "github:jrburke/requirejs/2.0.5",
-      "text": "github:requirejs/text/2.0.3",
-      "zepto": "github:madrobby/zepto/v0.8",
+      "knockout/knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js",
+      "compose/compose": "github:kriszyp/compose/v0.2.2",
       "store": "github:sfoster/amd-store/knockout-js",
-      "knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js",
-      "knockout.mapping": "https://raw.github.com/SteveSanderson/knockout.mapping/master/build/output/knockout.mapping-latest.debug.js",
-      "compose": "github:kriszyp/compose/v0.2.2",
-      "underscore": "github:amdjs/underscore/1.3.3"
+      "zepto": "github:madrobby/zepto/v0.8",
+      "lang/underscore": "http://underscorejs.org/underscore.js",
+      "knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js"
+    }
+  },
+  "volo": {
+    "dependencies": {
+      "zepto": "github:madrobby/zepto/v0.8"
     }
   }
 }

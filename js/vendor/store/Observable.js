@@ -1,4 +1,4 @@
-define(["lang", "./lib/promise", "knockout" /*=====, "./api/Store" =====*/
+define(["lang", "promise", "knockout" /*=====, "./api/Store" =====*/
 ], function(lang, Deferred, ko /*=====, Store =====*/){
 
 // module:
@@ -60,7 +60,7 @@ var Observable = function(/*Store*/ store){
 	var originalQuery = store.query;
 	store.query = function(query, options){
 		options = options || {};
-		console.log("initial query options: ", options);
+		// console.log("initial query options: ", options);
 		var results = originalQuery.apply(this, arguments);
 		// our return value - a knockout-js Observable
 		var observedResults = ko.observableArray(results), 
@@ -100,7 +100,7 @@ var Observable = function(/*Store*/ store){
 
 						// TODO: can use the previousIndex/newIndex to optimize this: maybe we can just push/pop or splice a single item
 						if(options.start || options.count) {
-							console.log("query options: ", options);
+							// console.log("query options: ", options);
 						}
 						// the range of the results we need to end up with: 
 						var rangeStart = options.start || 0, 
@@ -110,7 +110,7 @@ var Observable = function(/*Store*/ store){
 						var spliceStart = 0, 
 								spliceEnd = Math.max(observedResults().length, resultsArray.length);
 						
-						console.log("Splicing from: %s to %s", spliceStart, spliceEnd, resultsArray.length, resultsArray.slice(rangeStart, rangeEnd));
+						// console.log("Splicing from: %s to %s", spliceStart, spliceEnd, resultsArray.length, resultsArray.slice(rangeStart, rangeEnd));
 						observedResults.splice.apply(observedResults, [spliceStart, spliceEnd].concat(resultsArray.slice(rangeStart, rangeEnd)));
 					};
 					listeners.push(listener);
@@ -118,7 +118,7 @@ var Observable = function(/*Store*/ store){
 					// first listener was added, create the query checker and updater
 					queryUpdaters.push(queryUpdater = function(changed, existingId){
 						Deferred.when(results, function(resultsArray){
-							console.log("queryUpdater: ", changed, existingId);
+							// console.log("queryUpdater: ", changed, existingId);
 							var atEnd = resultsArray.length != options.count;
 							var i, l, listener;
 							if(++queryRevision != revision){
@@ -180,7 +180,7 @@ var Observable = function(/*Store*/ store){
 				
 				// wrap the callback to also pass in the update details to any subcriber to this observable
 				callback = lang.wrap(callback, function(callback, resultsArray){
-					console.log("subscriber callback, updateDetails: ", updateDetails);
+					// console.log("subscriber callback, updateDetails: ", updateDetails);
 					return callback.call(this, resultsArray, updateDetails);
 				});
 				
@@ -207,7 +207,7 @@ var Observable = function(/*Store*/ store){
 			// put results in there and hook up subscribers when we have them
 			observedResults.splice.apply(observedResults, [0, Math.max(observedResults().length, resultsArray.length)].concat(resultsArray));
 		});
-		console.log("Returning observableArray as results:", observedResults);
+		// console.log("Returning observableArray as results:", observedResults);
 		return observedResults;
 	};
 	var inMethod;

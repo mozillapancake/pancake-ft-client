@@ -1,8 +1,8 @@
-define(["../lib/util", "../lib/Promise"
+define(["../lib/util", "promise"
 ], function(lang, Promise){
 
 //  module:
-//    dojo/store/util/QueryResults
+//    store/util/QueryResults
 //  summary:
 //    The module defines a query results wrapper
 
