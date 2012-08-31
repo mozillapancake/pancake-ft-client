@@ -70,54 +70,8 @@
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
-<script type="text/javascript">
-  var config = {
-    thumbnailerStatus: "{{thumbnailer_status_url}}?job={jobId}",
-    thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
-    latticeRoot: "/lattice",
-    latticeUrl: "{latticeRoot}/{username}/{service}/{method}",
-    // Set reference to index of app
-    applicationRoot: "/",
-    appVersion: "{{js_app_version}}",
-    apiRoot: "/api/", 
-    searchRoot: "{{search_url}}",
-    searchResults: "http://"+ location.host +"/searchresult?query={?query?}&provider={provider}",
-    logging: "{{logging}}",
-    social: {
-      twitter: {
-        service_url: "http://twitter.com"
-      },
-      facebook: {
-        service_url: "http://facebook.com"
-      }
-    },
-    analyticsUrl: "/lattice/stats",
-    exceptionsUrl: "/lattice/exceptions",
-    paths: {
-      'promise': './vendor/store/lib/Promise',
-      'dollar': './vendor/zepto',
-      'json': './lib/json',
-      'text': './vendor/plugin/text'
-    },
-    packages: [
-      // package mappings
-      { name: 'store',   location: './vendor/store',      main: 'main' },
-      { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
-      { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },
-      { name: 'compose',  location: './vendor/compose',   main: 'compose' }
-    ],
-    // UTC timestamp 
-    pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
-  };
-  // some browser shims
-  config.platform = 'web';
-  config.paths.verifiedemail = 'lib/verifiedemail.browser';
-  config.paths.xmessage = 'lib/xmessage.browser';
-  // Use the browser logger in the browser environment.
-  config.paths.logger = 'lib/logger.browser';
-</script>
 
-
+<script src="../js/config.js"></script>
 <script src="https://login.persona.org/include.js" type="text/javascript"></script>
 <script src="../js/vendor/requirejs.js?v={{v}}"></script>
 <script>

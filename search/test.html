@@ -11,26 +11,7 @@
     </section>
   </div>
 
-<script type="text/javascript">
-  var config = {
-    packages: {
-      // package mappings
-      'dollar': './vendor/zepto',
-      'underscore': './vendor/underscore',
-      'knockout': './vendor/knockout',
-      'compose': './vendor/compose',
-      'promise': './vendor/store/lib/Promise',
-      'json': './lib/json',
-      'text': 'vendor/plugin/text'
-    },
-    // UTC timestamp 
-    pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
-  };
-  // some browser shims
-  config.platform = 'web';
-  config.packages.logger = 'lib/logger.browser';
-</script>
-
+<script src="../js/config.js"></script>
 <script src="../js/vendor/requirejs.js?v={{v}}"></script>
 <script>
   config.appName = "main";
@@ -38,10 +19,11 @@
   require({
     // configure our AMD loader
     baseUrl: '../js',
-    paths: config.packages,
+    packages: config.packages,
+    paths: config.paths,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['underscore', 'knockout', 'lib/knockout.composeWith'], function(util, ko){
+  }, ['lang', 'knockout', 'lib/knockout.composeWith'], function(util, ko){
 
     console.log("underscore: ", util);
     

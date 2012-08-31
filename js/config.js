@@ -1,67 +1,45 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-define([
-  'dollar', 
-  'lib/io',
-  'lib/io/jsonErrorResponseAdapter',  // call error handlers for 200 responses with { success: false }
-  'lib/io/deviceInfoAdapter',     // adds device/app info to each lattice request
-  'lib/io/needsTokenAdapter'          // give us config.csrf_token, config.username
-], function(
-  $, 
-  io,
-  jsonErrorResponseAdapter,
-  deviceInfoAdapter,
-  needsTokenAdapter
-){
-
-  function extend(thing1, thing2){
-    thing1 = thing1 || {}; 
-    for(var key in thing2 || {}){
-      thing1[key] = thing2[key];
+// loader and application config
+var config = {
+  thumbnailerStatus: "{{thumbnailer_status_url}}?job={jobId}",
+  thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
+  latticeRoot: "/lattice",
+  latticeUrl: "{latticeRoot}/{username}/{service}/{method}",
+  // Set reference to index of app
+  applicationRoot: "/",
+  appVersion: "{{js_app_version}}",
+  apiRoot: "/api/", 
+  searchRoot: "{{search_url}}",
+  searchResults: "http://"+ location.host +"/searchresult?query={?query?}&provider={provider}",
+  logging: "{{logging}}",
+  social: {
+    twitter: {
+      service_url: "http://twitter.com"
+    },
+    facebook: {
+      service_url: "http://facebook.com"
     }
-    return thing1;
-  }
-
-  var slice = Array.prototype.slice; 
-  
-  if(!(config && config.packages)){
-    throw "No config global";
-  }
-
-  function setupAjaxRegistry( /* plugins */){
-
-    io.installAdapter(); // replace $.ajax with our own registry-adapted dispatcher
-    
-    Array.prototype.forEach.call(arguments, function(adapter){
-      io.register(adapter.name, adapter.matcher, adapter);
-    });
-  }
-  
-  setupAjaxRegistry(
-    jsonErrorResponseAdapter, 
-    deviceInfoAdapter, 
-    needsTokenAdapter
-  );
-
-  // Set pixel density on config object for reference in other modules.
-  config.devicePixelRatio = window.devicePixelRatio || 1;
-
-  function queryToObject(queryStr) {
-    var pairs, nameValue, params = {};
-    if(queryStr){
-      pairs = queryStr.split('&');
-      for(var i=0; i<pairs.length; i++) {
-        nameValue = pairs[i].split('=');
-        params[ nameValue[0] ] = nameValue[1];
-      }
-    }
-    return params;
-  }
-  
-  extend(
-    config, queryToObject(location.search.substring(1))
-  );
-  return config;
-});
+  },
+  analyticsUrl: "/lattice/stats",
+  exceptionsUrl: "/lattice/exceptions",
+  paths: {
+    'promise': './vendor/store/lib/Promise',
+    'dollar': './vendor/zepto',
+    'json': './lib/json',
+    'text': './vendor/plugin/text'
+  },
+  packages: [
+    // package mappings
+    { name: 'store',   location: './vendor/store',      main: 'main' },
+    { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
+    { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },
+    { name: 'compose',  location: './vendor/compose',   main: 'compose' }
+  ],
+  // UTC timestamp 
+  pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
+};
+// some browser shims
+config.platform = 'web';
+config.paths.verifiedemail = 'lib/verifiedemail.browser';
+config.paths.xmessage = 'lib/xmessage.browser';
+// Use the browser logger in the browser environment.
+config.paths.logger = 'lib/logger.browser';
