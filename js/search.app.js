@@ -1,4 +1,6 @@
-define(['dollar', 'knockout', 'compose', 'lib/page', 'services/search', 'services/user', 'lib/knockout.composeWith'], function($, ko, Compose, Page, services){
+define([
+  'dollar', 'knockout', 'compose', 'lib/page', 'services/settings', 'services/search', 'services/user', 'lib/knockout.composeWith'
+], function($, ko, Compose, Page, settings, services){
   console.log("search.app loaded");
 
   // various views, aggregated onto one page
@@ -8,23 +10,19 @@ define(['dollar', 'knockout', 'compose', 'lib/page', 'services/search', 'service
   // page has a lifecycle: initialize, assign store, applyBindings
   
   window.services = services; 
+  window.settings = settings; 
   
-  var user = services.user();
-  console.log("search.app, user is observable? ", ko.isObservable(user));
-  console.log("search.app, user has value ", user());
   var viewModel = {
-    latestSearch: ko.observable(''),
-    savedSearches: services.search.savedSearches(),
+    latestSearch:   ko.observable(''),
+    savedSearches:  services.search.savedSearches(),
     yourResults:    services.search.yourResults(),
     theirResults:   services.search.theirResults(),
     webResults:     services.search.webResults(),
-    username: user.extend({ 
-      composeWith: [function(values){ 
-        console.log("username composeWith got: ", values);
-        return values.shift ? values.shift().username : values.username; 
-      }]
-    })
+    username:       settings.value('username')
   };
+  
+  
+  
   viewModel.latestSearch.subscribe(function(terms){
     console.log("latest search:", terms);
   });

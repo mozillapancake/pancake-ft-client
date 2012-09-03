@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-<header>Welcome <span data-bind="text: username()">...</span></header>
+<header>Welcome <span data-bind="text: username">...</span></header>
 <section id="topbar">
   <input type="text" data-placeholder="Search for..." data-bind="value: latestSearch"/><button>Go</button>
 
@@ -84,7 +84,9 @@
     packages: config.packages,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['search.app']);
+  }, ['bootstrap'], function(){
+    require(['search.app']);
+  });
 </script>
 
 </body>

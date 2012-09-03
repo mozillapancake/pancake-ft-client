@@ -5,15 +5,17 @@
 define([
   'dollar', 
   'lib/io',
-  'lib/io/jsonErrorResponseAdapter',  // call error handlers for 200 responses with { success: false }
-  'lib/io/deviceInfoAdapter',     // adds device/app info to each lattice request
-  'lib/io/needsTokenAdapter'          // give us config.csrf_token, config.username
+  'lib/io/jsonErrorResponseAdapter',       // call error handlers for 200 responses with { success: false }
+  'lib/io/pancakeData'                    // handle/re-route service data requests
+  // 'lib/io/deviceInfoAdapter',          // adds device/app info to each lattice request
+  // 'lib/io/needsTokenAdapter'           // give us config.csrf_token, config.username
 ], function(
   $, 
   io,
-  jsonErrorResponseAdapter,
-  deviceInfoAdapter,
-  needsTokenAdapter
+  jsonErrorResponseAdapter, 
+  pancakeDataAdapter// ,
+  //   deviceInfoAdapter
+  // needsTokenAdapter
 ){
 
   function extend(thing1, thing2){
@@ -35,14 +37,13 @@ define([
     io.installAdapter(); // replace $.ajax with our own registry-adapted dispatcher
     
     Array.prototype.forEach.call(arguments, function(adapter){
+      console.log("installing adapter: ", adapter.name);
       io.register(adapter.name, adapter.matcher, adapter);
     });
   }
   
   setupAjaxRegistry(
-    jsonErrorResponseAdapter, 
-    deviceInfoAdapter, 
-    needsTokenAdapter
+    jsonErrorResponseAdapter, pancakeDataAdapter
   );
 
   // Set pixel density on config object for reference in other modules.
