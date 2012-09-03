@@ -64,8 +64,8 @@ var Observable = function(/*Store*/ store){
 		var results = originalQuery.apply(this, arguments);
 		// our return value - a knockout-js Observable
 		var observedResults = ko.observableArray(results), 
-		    originalSubscribe = observedResults.subscribe;
-		  
+				originalSubscribe = observedResults.subscribe;
+			
 		var registerNotifyListener;
 		
 		if(results && results.forEach){
@@ -85,8 +85,13 @@ var Observable = function(/*Store*/ store){
 			
 			observedResults.subscribe = function(callback, callbackTarget, event, includeObjectUpdates){
 				// Knockout's observables use a subscribe method to register a callback for any changes to the results
-				//  that callback expects the new value(s) as its first argumen
+				//	that callback expects the new value(s) as its first argumen
 			
+				// default to always notifying a change, when an object in a query is updated
+				if(includeObjectUpdates !== false) {
+					includeObjectUpdates = true;
+				}
+				
 				// on the *first call only* , hook up our listener for notifications of changes in the store
 				// we need to make the changes to the observableArray once, and knockout will publish to all subscribers
 				if(listeners.length <= 0) {
