@@ -63,7 +63,7 @@ var Observable = function(/*Store*/ store){
 		// console.log("initial query options: ", options);
 		var results = originalQuery.apply(this, arguments);
 		// our return value - a knockout-js Observable
-		var observedResults = ko.observableArray(results), 
+		var observedResults = ko.observableArray( results instanceof Array ? results : undef ), 
 				originalSubscribe = observedResults.subscribe;
 			
 		var registerNotifyListener;
