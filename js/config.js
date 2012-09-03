@@ -25,7 +25,8 @@ var config = {
     'promise': './vendor/store/lib/Promise',
     'dollar': './vendor/zepto',
     'json': './lib/json',
-    'text': './vendor/plugin/text'
+    'text': './vendor/plugin/text',
+    'lscache': './vendor/lscache'
   },
   packages: [
     // package mappings
