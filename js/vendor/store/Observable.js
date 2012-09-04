@@ -103,20 +103,21 @@ var Observable = function(/*Store*/ store){
 						updateDetails.previousIndex = previousIndex; 
 						updateDetails.newIndex = newIndex;
 
-						// TODO: can use the previousIndex/newIndex to optimize this: maybe we can just push/pop or splice a single item
-						if(options.start || options.count) {
-							// console.log("query options: ", options);
-						}
-						// the range of the results we need to end up with: 
-						var rangeStart = options.start || 0, 
-								rangeEnd = options.count || resultsArray.length;
-						
-								// the range of the existing array we need to update
-						var spliceStart = 0, 
-								spliceEnd = Math.max(observedResults().length, resultsArray.length);
+						// // TODO: can use the previousIndex/newIndex to optimize this: maybe we can just push/pop or splice a single item
+						// if(options.start || options.count) {
+						//  // console.log("query options: ", options);
+						// }
+						// // the range of the results we need to end up with: 
+						// var rangeStart = options.start || 0, 
+						//    rangeEnd = options.count || resultsArray.length;
+						// 
+						//    // the range of the existing array we need to update
+						// var spliceStart = 0, 
+						//    spliceEnd = Math.max(observedResults().length, resultsArray.length);
 						
 						// console.log("Splicing from: %s to %s", spliceStart, spliceEnd, resultsArray.length, resultsArray.slice(rangeStart, rangeEnd));
-						observedResults.splice.apply(observedResults, [spliceStart, spliceEnd].concat(resultsArray.slice(rangeStart, rangeEnd)));
+						observedResults.valueHasMutated();
+						// observedResults.splice.apply(observedResults, [spliceStart, spliceEnd].concat(resultsArray.slice(rangeStart, rangeEnd)));
 					};
 					listeners.push(listener);
 					
