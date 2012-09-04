@@ -13,8 +13,6 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     return is;
   };
 
-  var username = settings.value('username');
-  
   function dataRequestAdapter(req){
     this.callNext = true; // pass the request along the chain for the next handler
     
@@ -24,12 +22,12 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     switch(query.type) {
       case 'user':
         this.callNext = false;
-        return username();
+        return settings.username();
       case 'search': 
-        console.log("username: ", username());
+        console.log("username: ", settings.username());
         url.path = [
           '', 
-          username(),
+          settings.username(),
           'stack', 
           'search'
         ].join('/');

@@ -3,28 +3,23 @@ define([
   'lang', 
   'compose', 
   'services/core', 
+  'services/settings', 
   'lib/signin', 
   'promise', 
   'knockout', 
   'knockout/mapping'
 ], function(
   $, 
-  util,
+  lang,
   Compose, 
   services, 
+  settings,
   signin,
   Promise,
   ko,
   koMapping
 ){
 
-  function successHandler(viewModel) {
-    return function(resp){
-      var data = ('string' == typeof resp) ? JSON.parse(resp) : resp;
-      koMapping.fromJS(data, viewModel);
-    };
-  }
-  
   var store = services; 
   var users = ko.observableArray([]); 
   // set up a live resultset that publishes updates to a knockout observable array
@@ -43,10 +38,14 @@ define([
   services.user = function(name, options) {
     options = options || {};
     // get the default username from settings
-    name = name || services.get('setting/username').value;
+    name = name || services.settings.username();
     var user = options.user || ko.observable({ username: name }), 
         unwrappedUser = user();
 
+    // Resources: 
+    //  user/name => username
+    //  user/verified => (Bool)verified
+    //  
     console.log("services.user, user is observable? ", ko.isObservable(user));
     console.log("services.user, user has value ", user());
     
@@ -62,7 +61,7 @@ define([
       }
     });
     
-    results.subscribe(util.extend(function(){
+    results.subscribe(lang.extend(function(){
       console.log("change to username query: ", arguments);
       // console.log("change to users: ", user, insertedIdx, removedIdx);
     }, { includeObjectUpdates: true }));
@@ -87,7 +86,7 @@ define([
     function onVerified(data){
       // If the user is active then we enter the app. Otherwise we show the 'thank you' text.
       var userData = user();
-      util.extend(userData, data);
+      lang.extend(userData, data);
       // update the observable with changes
       user(userData); 
       
@@ -112,7 +111,7 @@ define([
     }
     function onVerificationError(err){
       console.log("Login error: " + (err ? err.message : err));
-      user( util.extend(user(), {
+      user( lang.extend(user(), {
         error: err.message || "Error"
       }) );
     }

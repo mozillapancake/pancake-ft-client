@@ -18,7 +18,7 @@ define([
     yourResults:    services.search.yourResults(),
     theirResults:   services.search.theirResults(),
     webResults:     services.search.webResults(),
-    username:       settings.value('username')
+    username:       settings.username
   };
   
   
