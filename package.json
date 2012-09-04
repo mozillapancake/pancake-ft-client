@@ -25,8 +25,12 @@
     }
   },
   "volo": {
+    "baseUrl": "js/vendor",
     "dependencies": {
-      "zepto": "github:madrobby/zepto/v0.8"
+      "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
+      "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
+      "store": "github:sfoster/amd-store/knockout-js",
+      "lscache": "github:pamelafox/lscache/master"
     }
   }
 }
