@@ -9,7 +9,17 @@ define([
   $, 
   Promise
 ){
-
+  var hasPromises = false;
+  // test to see if this implementation of $.ajax returns promises or not
+  var req = $.ajax({
+    beforeSend: function(){
+      return false;
+    }
+  });
+  if(req && req.then) {
+    hasPromises = true;
+  }
+  
   var adaptedAjax = function(options){
     // zepto's $.ajax doesn't return promises like jquery 1.6+
     var onsuccess = options.success, 
@@ -32,7 +42,7 @@ define([
   };
 
   var exports = {
-    ajax: adaptedAjax,
+    ajax: hasPromises ? $.ajax : adaptedAjax,
     param: function(){
       return $.param.apply($, arguments);
     }

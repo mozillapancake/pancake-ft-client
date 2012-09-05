@@ -63,7 +63,7 @@ var Observable = function(/*Store*/ store){
 		// console.log("initial query options: ", options);
 		var results = originalQuery.apply(this, arguments);
 		// our return value - a knockout-js Observable
-		var observedResults = ko.observableArray( results instanceof Array ? results : undef ), 
+		var observedResults = ko.observableArray( results instanceof Array ? results : [] ), 
 				originalSubscribe = observedResults.subscribe;
 			
 		var registerNotifyListener;
@@ -211,7 +211,8 @@ var Observable = function(/*Store*/ store){
 		}
 		Deferred.when(results, function(resultsArray){
 			// put results in there and hook up subscribers when we have them
-			observedResults.splice.apply(observedResults, [0, Math.max(observedResults().length, resultsArray.length)].concat(resultsArray));
+			var unwrappedResults = observedResults() || []; 
+			observedResults.splice.apply(observedResults, [0, Math.max(unwrappedResults.length, resultsArray.length)].concat(resultsArray));
 		});
 		// console.log("Returning observableArray as results:", observedResults);
 		return observedResults;
