@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jasmine Spec Runner</title>
+  <link rel="shortcut icon" type="image/png" href="./lib/jasmine-1.1.0.rc1/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="./lib/jasmine-1.1.0.rc1/jasmine.css">
+  <script type="text/javascript" src="./lib/jasmine-1.1.0.rc1/jasmine.js"></script>
+  <script type="text/javascript" src="./lib/jasmine-1.1.0.rc1/jasmine-html.js"></script>
+
+  <script type="text/javascript" src="../js/config.js"></script>
+  <script type="text/javascript" src="../js/vendor/requirejs.js"></script>
+
+  <script type="text/javascript">
+    config.paths.spec = '../test/spec';
+    config.paths.test = '../test';
+    
+    require({
+      // configure our AMD loader
+      baseUrl: '../js',
+      packages: config.packages,
+      paths: config.paths,
+      waitSeconds: 20,
+      urlArgs: "r={{v}}" // r is a cache-busting token
+    });
+    require([
+      //include all specs to be run
+      'spec/MiddlewareSpec'
+    ], function() {
+        //run tests
+        jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+        jasmine.getEnv().execute();
+      });
+  </script>
+</head>
+
+<body>
+</body>
+</html>
