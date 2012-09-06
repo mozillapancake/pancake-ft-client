@@ -23,58 +23,100 @@
     paths: config.paths,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['lang', 'knockout', 'lib/knockout.composeWith'], function(util, ko){
+  }, ['lang', 'promise'], function(lang, Promise){
 
-    console.log("underscore: ", util);
-    
-
-    var nameStream = window.nameStream = ko.observableArray([{ name: "Bob" }, { name: "Dave"}, { name: "Adam"}]);
-    nameStream.subscribe(function(values){
-      console.log("nameStream event: ", values );
-    });
-    
-    var nameReducer = function(prev, val, idx){
-      console.log("nameReducer: ", prev, val, idx);
-      return prev + ", son of " + val;
-    };
-    
-    function curryPlucker(key) {
-      return function(values) {
-        return values.map(function(value){ 
-          return value[key]; 
-        });
-      }
-    }
-
-    function logger(name) {
-      return function(values) {
-        console.log(name + " logger: got values: ", values);
-        return values;
+    function chain(){
+      var defd = Promise.defer(), 
+          promise = defd.promise;
+      var handlers = Array.prototype.slice.call(arguments), 
+          pair; 
+      var onerror = function(err){
+        console.log("onError: ", err);
       };
+
+      var promise = handlers.reduce(function(promise, pair){
+        return promise.then(pair[0] || passthru, pair[1] || onerror);
+      }, defd.promise);
+
+      // while((fn = handlers.shift())){
+      //   promise = promise.then(fn);
+      // }
+      return defd;
     }
     
-    var viewModel = window.viewModel = {
-      name:  nameStream.extend({ 
-        composeWith: [
-          // logger('name field'), 
-          curryPlucker('name'), 
-          function(values) { 
-            return values.reduce(nameReducer);
-          },
-          logger('post-name field') 
-        ] 
-      }),
-      ancestorsCount: nameStream.extend({ 
-        composeWith: [
-          // logger('ancestorsCount field'), 
-          util.tail, 
-          util.size,
-          logger('post-ancestorsCount field') 
-        ]
-      })
-    };
+    var defd = chain(
+      [function(alpha){
+        console.log("first: ", alpha);
+        return alpha + String.fromCharCode(1+alpha.charCodeAt(0));
+      }], 
+      [function(alpha){
+        console.log("2nd: ", alpha);
+        return alpha + String.fromCharCode(4+alpha.charCodeAt(0));
+      }], 
+      [function(alpha){
+        console.log("3rd: ", alpha);
+        console.log("Finally: ", alpha);
+      }]
+    );
     
-    ko.applyBindings(viewModel, document.getElementById("container"));
+    // setTimeout(function(){
+    //   defd.resolve("a");
+    // });
+    
+    var stack = [];
+    function use(testFn, handle){
+      // register a middleware for this kind of request
+      stack.push({ test: testFn, handle: handle });
+      return this; 
+    }
+    
+    fetch = function(options){
+      // go through the registered middleware and see which want to handle this reqeust
+      var defd = Promise.defer();
+      // pass request options through each matching handler
+      options = stack.reduce(function(req, layer){
+        if(layer.test(req)){
+          req = layer(req, defd.promise, next);
+        }
+        return options;
+      });
+      req.success = function(resp, status, xhr){
+        console.log("Ok, got ", resp, status, xhr);
+        def.resolve(resp, status, xhr);
+      };
+      req.error = function(xhr, status, err){
+        console.log("Not ok, got ", xhr, status, err);
+        def.reject(xhr, status, err);
+      };
+      
+      $.ajax(req);
+      return defd.promise;
+    }
+    function handle(req) {
+      // $.ajax = 
+    }
+      var resp = Promise.defer(), 
+          promise = defd.promise;
+          
+      var middlewares = Array.prototype.slice.call(arguments);
+      
+      // build a chain of functions that'll each get passed req, resp, next
+      // the composition is sync, though resolution will be async
+
+      // req -> req -> req 
+      // 
+      // resp <-- resp <-- resp
+      var handler = function(req) {
+        var fns = Array.prototype.slice.call(middlewares);
+        var next = function next(){
+          var handle = fns.shift();
+          handle(req, resp, next);
+        }
+        return next();
+      }
+      return handler;
+    }
+    var 
 
   });
 </script>

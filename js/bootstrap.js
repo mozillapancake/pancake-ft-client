@@ -5,18 +5,20 @@
 define([
   'dollar', 
   'lib/io',
-  'lib/io/jsonErrorResponseAdapter',       // call error handlers for 200 responses with { success: false }
+  'lib/io/jsonResultAdapter',             // pass 'd' as result, call error handlers for 200 responses with { success: false }
   'lib/io/pancakeData'                    // handle/re-route service data requests
   // 'lib/io/deviceInfoAdapter',          // adds device/app info to each lattice request
   // 'lib/io/needsTokenAdapter'           // give us config.csrf_token, config.username
 ], function(
   $, 
   io,
-  jsonErrorResponseAdapter, 
+  jsonResultAdapter,
   pancakeDataAdapter// ,
   //   deviceInfoAdapter
   // needsTokenAdapter
 ){
+
+  console.log("Bootstrap loading, env:", config);
 
   function extend(thing1, thing2){
     thing1 = thing1 || {}; 
@@ -32,19 +34,21 @@ define([
     throw "No config global";
   }
 
-  function setupAjaxRegistry( /* plugins */){
-
-    io.installAdapter(); // replace $.ajax with our own registry-adapted dispatcher
-    
-    Array.prototype.forEach.call(arguments, function(adapter){
-      console.log("installing adapter: ", adapter.name);
-      io.register(adapter.name, adapter.matcher, adapter);
-    });
-  }
-  
-  setupAjaxRegistry(
-    jsonErrorResponseAdapter, pancakeDataAdapter
-  );
+  io.installAdapter(); // replace $.ajax with our own registry-adapted dispatcher
+  io.ajax.before(function(args, resp, next){
+    if(pancakeDataAdapter.matcher(args[0])) {
+      pancakeDataAdapter(args, resp, next);
+    } else {
+      next(args, resp);
+    }
+  });
+  io.ajax.after(function(args, resp, next){
+    if(jsonResultAdapter.matcher(args[0])) {
+      jsonResultAdapter(args, resp, next);
+    } else {
+      next(args, resp);
+    }
+  });
 
   // Set pixel density on config object for reference in other modules.
   config.devicePixelRatio = window.devicePixelRatio || 1;
@@ -64,5 +68,6 @@ define([
   extend(
     config, queryToObject(location.search.substring(1))
   );
+  console.log("Bootstrap done, returning config:", config);
   return config;
 });

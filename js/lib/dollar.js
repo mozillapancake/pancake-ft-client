@@ -2,9 +2,10 @@ define(['zepto', 'promise'], function($, Promise){
 
   var originalAjax = $.ajax;
   var hasPromises = false;
+  var undef;
   // test to see if this implementation of $.ajax returns promises or not
   var req = $.ajax({
-    beforeSend: function(){
+    beforeSend: function(xhr){
       return false;
     }
   });
@@ -12,31 +13,35 @@ define(['zepto', 'promise'], function($, Promise){
     hasPromises = true;
   }
   
-  var adaptedAjax = function(options){
+  var promiseAdaptedAjax = function(options){
+    options = options || {};
     console.log("dollar.js, adaptedAjax call");
     // zepto's $.ajax doesn't return promises like jquery 1.6+
     var onsuccess = options.success, 
         onerror = options.error,
-        promise = new Promise();
-        
+        defd = Promise.defer();
+
+    if(options.onsuccess || options.error){
+      defd.promise.then(options.onsuccess, options.error);
+    }
+
     options.success = function(data, status, xhr){
-      promise.xhr = xhr;
-      if(onsuccess) onsuccess.apply(this, arguments);
-      return promise.resolve.apply(promise, arguments);
+      var ret = defd.resolve.apply(defd, arguments);
+      console.log("dollar success; got return value: ", ret);
+      return ret;
     };
     options.error = function(xhr, status, err){
-      promise.xhr = xhr;
-      if(onerror) onerror.apply(this, arguments);
-      return promise.reject.call(promise, arguments[0], Boolean("dont throw on error"));
+      return defd.reject.call(defd, arguments[0], Boolean("dont throw on error"));
     };
     
     originalAjax.apply($, arguments);
-    return promise;
+    return defd.promise;
   };
 
   if(!hasPromises) {
     console.log("dollar.js, wrapping $.ajax to return promises");
-    $.ajax = adaptedAjax;
+    promiseAdaptedAjax.installedBy = "dollar.js";
+    $.ajax = promiseAdaptedAjax;
   }
   return $;
 });

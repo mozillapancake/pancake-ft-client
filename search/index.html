@@ -20,40 +20,15 @@
 <header>Welcome <span data-bind="text: username">...</span></header>
 <section id="topbar">
   <input type="text" data-placeholder="Search for..." data-bind="value: latestSearch"/><button>Go</button>
-
-  <p>Saved searches:</p>
-  <ul data-bind="foreach: savedSearches">
-    <li>
-      <span data-bind="text: title"></span>
-  	</li>
-  </ul>
   <p>[search bar w. suggestions (populated w. search terms)]</p>
 </section>
-<section id="your_results">
-  <h1>Your stuff</h1>
-  <ul id="results_yours" data-bind="foreach: yourResults">
+<section id="top_rated_section">
+  <h1>Top Rated</h1>
+  <ul id="results_top_rated" data-bind="foreach: topRated">
     <li>
-      <span data-bind="text: title"></span>
-  	</li>
+      <span data-bind="text: $index"></span>
+    </li>
   </ul>
-</section>
-<section id="others_results">
-  <h1>Other people's stuff</h1>
-  <ul id="results_yours" data-bind="foreach: theirResults">
-    <li>
-      <span data-bind="text: title"></span>
-  	</li>
-  </ul>
-  <ul data-bind="foreach: theirResults">
-</section>
-<section id="web_results">
-  <h1>Web results</h1>
-  <ul id="results_web" data-bind="foreach: webResults">
-    <li>
-      <span data-bind="text: title"></span>
-  	</li>
-  </ul>
-  <h2>Suggestions</h2>
 </section>
 
 <nav id="sidebar">
@@ -84,7 +59,8 @@
     packages: config.packages,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['bootstrap'], function(){
+  }, ['bootstrap'], function(env){
+    console.log("Bootstrap finished, env:", env);
     require(['search.app']);
   });
 </script>

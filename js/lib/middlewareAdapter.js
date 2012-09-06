@@ -1,4 +1,5 @@
 define(['promise'], function(Promise){
+  var undef;
   function adapt(originalFn, ctx) {
     var befores = [];
     var afters = [];
@@ -40,7 +41,19 @@ define(['promise'], function(Promise){
         resultValue = originalFn.apply(ctx || null, callArgs);
         if('function' === typeof resultValue.then) {
           console.log("originalFunction returned a promise");
-          return resultValue.then(onResult, onResult);
+          var defd = Promise.defer(); // return our own promise
+          var promisedResult = resultValue;
+          resultValue = undef;
+          promisedResult.then(function(resp){
+            onResult(resp);
+            defd.resolve(resultValue);
+          }, function(err){
+            // FIXME: how do we want to handle errors here? 
+            // they are just passed into the result handlers for now
+            onResult.apply(null, arguments);
+            defd.reject(resultValue);
+          });
+          return defd.promise;
         } else {
           console.log("returning non-promised result: ", resultValue);
           return onResult(resultValue);

@@ -21,14 +21,7 @@ define([
 ){
 
   var store = services; 
-  var users = ko.observableArray([]); 
-  // set up a live resultset that publishes updates to a knockout observable array
-  Promise.when(store.query({ type: 'user' }), function(results){
-    results.subscribe(function(){ 
-      console.log("Updates to users results: ", arguments);
-    });
-  });
-  
+
   var handleError = function(msg) {
     return function(err) {
       console.warn(msg, err);

@@ -13,16 +13,27 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     return is;
   };
 
-  function dataRequestAdapter(req){
-    this.callNext = true; // pass the request along the chain for the next handler
-    
+  function dataRequestAdapter(args, res, next){
+    var req = args[0];
+    // map store request urls to their proper lattice urls
     var url = Url.parse(req.url);
     var query = url.query || {};
     console.log("dataRequestAdapter, request for: ", req);
     switch(query.type) {
       case 'user':
-        this.callNext = false;
-        return settings.username();
+        req.url = '/lattice/session/active';
+        break;
+      case 'top_rated': 
+        url.path = ['',
+          settings.username(), 
+          'stack', 
+          'top_rated'
+        ].join('/');
+        console.log("top_rated url: ", url, url.toString());
+        delete query.type;
+        req.url = url.toString();
+        req.envelope = 'd';
+        break;
       case 'search': 
         console.log("username: ", settings.username());
         url.path = [
@@ -34,10 +45,10 @@ define(['lib/url', 'services/settings'], function(Url, settings){
         console.log("url: ", url, url.toString());
         delete query.type;
         req.url = url.toString();
+        req.envelope = 'd';
         break;
     }
-    // map store request urls to their proper lattice urls
-    // go to localStorage first where appropriate
+    next(args, res);
   }
   
   dataRequestAdapter.name = "dataRequestAdapter";

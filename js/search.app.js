@@ -1,10 +1,10 @@
 define([
-  'dollar', 'knockout', 'compose', 'lib/page', 'services/settings', 'services/search', 'services/user', 'lib/knockout.composeWith'
+  'dollar', 'knockout', 'compose', 'lib/page', 'services/settings', 'services/search', 'lib/knockout.composeWith'
 ], function($, ko, Compose, Page, settings, services){
   console.log("search.app loaded");
 
   // various views, aggregated onto one page
-  var app = Compose.create(Page, {
+  var app = window.app = Compose.create(Page, {
     el: 'body'
   });
   // page has a lifecycle: initialize, assign store, applyBindings
@@ -12,12 +12,12 @@ define([
   window.services = services; 
   window.settings = settings; 
   
-  var viewModel = {
+  var viewModel = app.viewModel = {
     latestSearch:   ko.observable(''),
-    savedSearches:  services.search.savedSearches(),
-    yourResults:    services.search.yourResults(),
-    theirResults:   services.search.theirResults(),
-    webResults:     services.search.webResults(),
+    // savedSearches:  services.search.savedSearches(),
+    topRated:    services.search.topRated(),
+    // theirResults:   services.search.theirResults(),
+    // webResults:     services.search.webResults(),
     username:       settings.username
   };
   

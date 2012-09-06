@@ -33,6 +33,13 @@ define([
   }
   
   services.search = Compose.create(services.search || {}, {
+    topRated: function(options){
+      // could use lang.once to ensure this only gets called once
+      // - the query itself never changes, only range/post-processing options
+      // so we can create once and return the same result each subsequent call
+      var resultset = services.query({ type: 'top_rated' });
+      return resultset;
+    },
     yourResults: function(query, options){
       options = options || {};
       var self = this;
