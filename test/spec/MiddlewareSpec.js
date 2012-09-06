@@ -56,22 +56,87 @@ define(['dollar', 'promise', 'lib/middlewareAdapter'], function($, Promise, adap
     });
 
     it("Allows registration of middleware to match certain requests", function(){
-      var doSomething = function(a, b){ return a + b; };
-      expect("TODO").toBe("Test implemented");
+      var allNumbers = function() {
+        var args = Array.prototype.slice.call(arguments);
+        return args.every(function(n) { 
+          return 'number'===typeof n; 
+        });
+      };
+
+      var sumArguments = function(a, b){ 
+        return a + b; 
+      };
+      var timesTwoMiddleware = function(args, res, next) {
+        next(args, res*2 );
+      };
+      expect( sumArguments(1,4) ).toBe(5);
+      
+      sumArguments = adapt(sumArguments);
+      sumArguments.after(function(args, res, next){
+        return allNumbers.apply(null, args) ? 
+            timesTwoMiddleware(args, res, next) : 
+            next(args, res);
+      });
+      expect( sumArguments(3,7) ).toBe(20);
+      expect( sumArguments("8",1) ).toBe('81');
     });
 
   });
 
   describe("Middleware functionality", function() {
+    var firstFoo = function(args, res, next){
+      args[0].foo += ':1st';
+      next(args, res);
+    }; 
+    var secondFoo = function(args, res, next){
+      args[0].foo += ':2nd';
+      next(args, res);
+    };
+    var afterFoo = function(args, res, next){
+      res += ':after';
+      next(args, res);
+    };
+    
+    var doSomething = function(options) {
+      return options.foo;
+    };
+
     it("Modifies the request in the expected order", function(){
-      expect("TODO").toBe("Test implemented");
+      var func = adapt(doSomething); 
+      expect(doSomething({ foo: 'bar' })).toBe('bar');
+
+      func.before(firstFoo);
+      func.after(afterFoo);
+      func.before(secondFoo);
+      
+      expect(func({ foo: 'start' })).toBe('start:1st:2nd:after');
     });
-    it("Modifies the response in the expected order", function(){
-      expect("TODO").toBe("Test implemented");
+
+    it("Allows dismantling of the middleware chain to restore the original function", function(){
+      var func = adapt(doSomething); 
+      expect(doSomething({ foo: 'bar' })).toBe('bar');
+      expect(func({ foo: 'bar' })).toBe('bar');
+
+      func.after(afterFoo);
+      
+      expect(func({ foo: 'start' })).toBe('start:after');
+      
+      func = func.restore();
+
+      expect(func({ foo: 'start' })).toBe('start');
     });
 
     it("Allows a middleware can shortcut the chain", function(){
-      expect("TODO").toBe("Test implemented");
+      var func = adapt(doSomething); 
+      func.before(firstFoo);
+      func.before(function(args, res, next){
+        res = doSomething.apply(null, args);
+        next(args, res, adapt.END);
+      });
+      func.after(afterFoo);
+      func.before(secondFoo);
+      
+      expect(func({ foo: 'start' })).toBe('start:1st');
     });
 
     it("Propagates errors in the response back up the chain", function(){
