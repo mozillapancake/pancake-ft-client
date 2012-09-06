@@ -22,7 +22,7 @@ var config = {
   analyticsUrl: "/lattice/stats",
   exceptionsUrl: "/lattice/exceptions",
   paths: {
-    'promise': './vendor/store/lib/Promise',
+    'promise': './vendor/q',
     'dollar': './lib/dollar',
     'json': './lib/json',
     'text': './vendor/plugin/text',
