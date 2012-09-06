@@ -1,68 +1,5 @@
-define(['dollar', 'promise'], function($, Promise) {
+define(['dollar', 'promise', 'lib/middlewareAdapter'], function($, Promise, adapt) {
 
-  // adapt a function to have a 'register' method, allowing handlers to be registered for calls to it
-  var middleware = {
-    adapt: function(fn, ctx) {
-      var befores = [], 
-          afters: [];
-      var onError = function(err){ console.warn("Error: ", err); };
-      var adapted = function(){
-        var args = Array.prototype.slice.call(arguments);
-
-        // get the subset of registered handlers that wish to participate based on the call args
-        var beforeStack = befores.slice();
-        var next = function(req, resp) {
-          var handler = beforeStack.shift();
-          // if handler.accept(req, resp)
-          handler(req, resp, function(){ })
-        }
-        beforeHandlers.forEach(function(mware){
-          if(mware.accept && !mware.accept(args)) {
-            return;
-          }
-          var next = function(){}
-          return mware.accept && mware.accept(args) ? mware(args, resp, next) : args;
-        });
-        
-        var stack = befores.filter(function(mware){
-          
-        });
-        
-        // request phase
-        args = stack.reduce(function(returnArgs, mware){
-          if(mware.processRequest) {
-            returnArgs = mware.processRequest.apply(null, returnArgs);
-          }
-          return returnArgs;
-        }, args);
-
-        // call the original with the modified args to get a result
-        var promise = Promise.when(fn.apply(ctx||null, args), function(result){
-          // response phase
-          result = stack.reduce(function(resp, mware){
-            if(mware.processResponse) {
-              resp = mware.processResponse.call(null, resp);
-            }
-            return resp;
-          }, result);
-          return result;
-        }, onError);
-        return promise;
-      };
-      adapted.original = fn;
-      // register middleware function
-      // to be applied when something is true
-      adapted.registe = function() {
-        middlewares.push(mware);
-      };
-      adapted.restore = function() {
-        middlewares = null;
-        return fn;
-      };
-      return adapted;
-    }
-  };
-  
   describe("Middleware usage", function() {
 
     var doubleArgs = function(a, b) {
@@ -71,21 +8,19 @@ define(['dollar', 'promise'], function($, Promise) {
     var squareResult = function(res) {
       return res*res;
     };
-    var doubleAndThenSquare = {
-      accept: function(a,b){ var is = ('number'==typeof a && 'number'==typeof b); return is; },
-      processRequest: doubleArgs,
-      processResponse: squareResult
+    var doubleAndThenSquare = function(args, result, next){
+      args = doubleArgs.apply(null, args);
+      args = squareResult.apply(null, args);
     };
-    var reportResult = {
-      accept: Boolean,
-      processResponse: function(result) {
-        return "Result was: " + result;
-      }
-    };
-
+    
     it("Loads and exposes the expected API", function(){
-      expect(middleware).toBeTruthy();
-      expect(typeof middleware.adapt).toBe('function');
+      expect(adapt).toBeTruthy();
+      expect(typeof adapt).toBe('function');
+      var adapted = adapt(function(){});
+      expect(typeof adapted).toBe('function');
+      expect(typeof adapted.before).toBe('function');
+      expect(typeof adapted.after).toBe('function');
+      expect(typeof adapted.restore).toBe('function');
     });
 
     it("Allows functions to be adapted to accept middleware", function(){
@@ -96,11 +31,15 @@ define(['dollar', 'promise'], function($, Promise) {
       expect(doSomething(1,2)).toBe(3);
 
       // adapt it to allow registration of middleware
-      doSomething = middleware.adapt(doSomething);
-      expect(typeof doSomething).toBe('function');
-      expect(typeof doSomething.register).toBe('function');
+      doSomething = adapt(doSomething);
 
-      doSomething.register(doubleAndThenSquare);
+      // double then square
+      doSomething.before(function(args, res, next){
+        next( doubleArgs.apply(null, args), res );
+      });
+      doSomething.after(function(args, res, next){
+        next( args, squareResult(res) );
+      });
 
       Promise.when(doSomething(1,2), function(res){
         result = res;
@@ -118,9 +57,7 @@ define(['dollar', 'promise'], function($, Promise) {
 
     it("Allows registration of middleware to match certain requests", function(){
       var doSomething = function(a, b){ return a + b; };
-      doSomething = middleware.adapt(doSomething);
-      doSomething.register(doubleAndThenSquare);
-      
+      expect("TODO").toBe("Test implemented");
     });
 
   });

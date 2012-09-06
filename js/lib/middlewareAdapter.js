@@ -41,9 +41,12 @@ define(['promise'], function(Promise){
         if('function' === typeof resultValue.then) {
           console.log("originalFunction returned a promise");
           return resultValue.then(onResult, onResult);
+        } else {
+          console.log("returning non-promised result: ", resultValue);
+          return onResult(resultValue);
         }
       }
-      console.log("returning non-promised result: ", resultValue);
+      console.log("no after-filters, returning result: ", resultValue);
       return resultValue;
     };
     
@@ -52,6 +55,10 @@ define(['promise'], function(Promise){
     };
     adapted.after = function(fn) {
       afters.push(fn);
+    };
+    adapted.restore = function() {
+      afters = []; befores = []; 
+      return originalFn;
     };
     return adapted;
   }
