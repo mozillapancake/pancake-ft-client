@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <script type="text/javascript" src="../js/config.js"></script>
+  <script type="text/javascript" src="../js/vendor/requirejs.js"></script>
+
+  <script type="text/javascript">
+    config.paths.spec = '../test/spec';
+    config.paths.test = '../test';
+    
+    require({
+      // configure our AMD loader
+      baseUrl: '../js',
+      packages: config.packages,
+      paths: config.paths,
+      waitSeconds: 20,
+      urlArgs: "r={{v}}" // r is a cache-busting token
+    });
+    require([
+      'lib/middlewareAdapter',
+      'dollar',
+      'promise'
+    ], function(adapt, $, Promise) {
+      
+      function doSomething(options) {
+        console.log("doSomething got options: ", options);
+        return "befores: " + options.wozHere + ", afters: ";
+      }
+      
+      doSomething = adapt(doSomething);
+      
+      doSomething.after(function(args, result, next){
+        result +=", Barney";
+        next(args, result);
+      });
+      doSomething.before(function(args, result, next){
+        args[0].wozHere +=", Foo";
+        next(args, result);
+      });
+      doSomething.before(function(args, result, next){
+        result = { value: result };
+        next(args, result);
+      });
+      doSomething.before(function(args, result, next){
+        args[0].wozHere +=", Bar";
+        next(args, result);
+      });
+
+      $.ajax = adapt($.ajax, $);
+
+      var result = doSomething({ wozHere: "Initial value" });
+      console.log("doSomething response: ", result);
+      
+      $.ajax.after(function(args, result, next){
+        console.log("After handler, got result: ", result);
+        result = { d: ["faux", "response"]};
+        next(args, result, adapt.END);
+      });
+      
+      Promise.when($.ajax({}), function(resp){
+        console.log("final response: ", resp);
+      }, function(err){
+        console.warn("Error: ", err);
+      });
+      
+
+    });
+  </script>
+</head>
+
+<body>
+</body>
+</html>
