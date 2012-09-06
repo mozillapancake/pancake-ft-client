@@ -23,10 +23,11 @@ var config = {
   exceptionsUrl: "/lattice/exceptions",
   paths: {
     'promise': './vendor/store/lib/Promise',
-    'dollar': './vendor/zepto',
+    'dollar': './lib/dollar',
     'json': './lib/json',
     'text': './vendor/plugin/text',
-    'lscache': './vendor/lscache'
+    'lscache': './vendor/lscache',
+    'zepto': './vendor/zepto'
   },
   packages: [
     // package mappings

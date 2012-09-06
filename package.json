@@ -30,7 +30,8 @@
       "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
       "store": "github:sfoster/amd-store/knockout-js",
-      "lscache": "github:pamelafox/lscache/master"
+      "lscache": "github:pamelafox/lscache/master",
+      "q": "github:kriskowal/q/v0.8.8"
     }
   }
 }
