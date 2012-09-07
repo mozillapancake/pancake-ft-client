@@ -26,7 +26,8 @@
   <h1>Top Rated</h1>
   <ul id="results_top_rated" data-bind="foreach: topRated">
     <li>
-      <span data-bind="text: $index"></span>
+      <span data-bind="text: title"></span>
+      <img src="" data-bind="attr: { src: imgUrl, alt:'Screenshot of '+title }"/>
     </li>
   </ul>
 </section>

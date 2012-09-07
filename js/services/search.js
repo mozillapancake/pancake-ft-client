@@ -38,6 +38,12 @@ define([
       // - the query itself never changes, only range/post-processing options
       // so we can create once and return the same result each subsequent call
       var resultset = services.query({ type: 'top_rated' });
+      resultset.subscribe(function(items, details){
+        console.log("got topRated results: ", items, details);
+      });
+      settings.username.subscribe(function(newName){
+        console.log("username changed to "+newName+", need to resubmit the query");
+      });
       return resultset;
     },
     yourResults: function(query, options){

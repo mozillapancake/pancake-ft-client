@@ -12,6 +12,8 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     console.log("IsDataRequest? ", req.url, is);
     return is;
   };
+  dataRequestAdapter.name = "dataRequestAdapter";
+  dataRequestAdapter.matcher = isDataRequest;
 
   function dataRequestAdapter(args, res, next){
     var req = args[0];
@@ -50,9 +52,28 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     }
     next(args, res);
   }
-  
-  dataRequestAdapter.name = "dataRequestAdapter";
-  dataRequestAdapter.matcher = isDataRequest;
 
-  return dataRequestAdapter;
+  function dataResponseAdapter(args, res, next){
+    var req = args[0];
+    // filter responses to  store requests
+    var url = Url.parse(req.url);
+    var query = url.query || {};
+    console.log("dataResponseAdapter, response to: ", req);
+    switch(query.type) {
+      case 'user':
+      case 'top_rated': 
+      case 'search': 
+        break;
+    }
+    next(args, res);
+  }
+  dataResponseAdapter.name = "dataResponseAdapter";
+  dataResponseAdapter.matcher = function(req){
+    return (req.dataType && req.dataType == 'json');
+  };
+  
+  return {
+    requestAdapter: dataRequestAdapter,
+    responseAdapter: dataResponseAdapter
+  };
 });

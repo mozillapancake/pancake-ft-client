@@ -13,7 +13,7 @@ define([
   $, 
   io,
   jsonResultAdapter,
-  pancakeDataAdapter// ,
+  dataAdapters// ,
   //   deviceInfoAdapter
   // needsTokenAdapter
 ){
@@ -36,19 +36,28 @@ define([
 
   io.installAdapter(); // replace $.ajax with our own registry-adapted dispatcher
   io.ajax.before(function(args, resp, next){
-    if(pancakeDataAdapter.matcher(args[0])) {
-      pancakeDataAdapter(args, resp, next);
+    if(dataAdapters.requestAdapter.matcher(args[0])) {
+      console.log("Applying requestAdapter");
+      dataAdapters.requestAdapter(args, resp, next);
     } else {
       next(args, resp);
     }
   });
   io.ajax.after(function(args, resp, next){
     if(jsonResultAdapter.matcher(args[0])) {
+      console.log("Applying jsonResultAdapter");
       jsonResultAdapter(args, resp, next);
     } else {
       next(args, resp);
     }
   });
+  // io.ajax.after(function(args, resp, next){
+  //   if(dataAdapters.responseAdapter.matcher(args[0])) {
+  //     dataAdapters.responseAdapter(args, resp, next);
+  //   } else {
+  //     next(args, resp);
+  //   }
+  // });
 
   // Set pixel density on config object for reference in other modules.
   config.devicePixelRatio = window.devicePixelRatio || 1;
