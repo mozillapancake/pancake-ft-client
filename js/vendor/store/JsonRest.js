@@ -178,6 +178,7 @@ lang.mixin(JsonRest.prototype, {
 			dataType: "json",
 			headers: headers
 		});
+		console.log("JsonRest GET returned: ", results);
 		results.total = results.then(function(){
 			var range = (results.xhr || resultsXhr).getResponseHeader("Content-Range");
 			return range && (range = range.match(/\/(.*)/)) && +range[1];

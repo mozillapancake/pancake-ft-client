@@ -65,7 +65,24 @@ var Observable = function(/*Store*/ store){
 		// our return value - a knockout-js Observable
 		var observedResults = ko.observableArray( results instanceof Array ? results : [] ), 
 				originalSubscribe = observedResults.subscribe;
-			
+		
+		// new methods on the observable array to start/end a match of changes 
+		// and only get one set of notifications
+		observedResults.batchStart = function(){
+			this._oldValueHasMutated = this.valueHasMutated;
+			this._oldValueWillMutate = this.valueWillMutate;
+
+			this.valueWillMutate();
+			this.valueWillMutate = this.valueHasMutated = function(){}; 
+			return this;
+		};
+		observedResults.batchEnd = function(){
+			this.valueHasMutated = this._oldValueHasMutated;
+			this.valueWillMutate = this._oldValueWillMutate;
+			this.valueHasMutated();
+			return this;
+		};
+		
 		var registerNotifyListener;
 		
 		if(results && results.forEach){
