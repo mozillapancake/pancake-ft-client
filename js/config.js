@@ -22,7 +22,6 @@ var config = {
   analyticsUrl: "/lattice/stats",
   exceptionsUrl: "/lattice/exceptions",
   paths: {
-    'promise': './vendor/q',
     'dollar': './lib/dollar',
     'json': './lib/json',
     'text': './vendor/plugin/text',
@@ -35,7 +34,8 @@ var config = {
     { name: 'store',   location: './vendor/store',      main: 'main' },
     { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
     { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },
-    { name: 'compose',  location: './vendor/compose',   main: 'compose' }
+    { name: 'compose',  location: './vendor/compose',   main: 'compose' },
+    { name: 'promise',  location: './vendor/promised-io',   main: 'promise' }
   ],
   // UTC timestamp 
   pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
