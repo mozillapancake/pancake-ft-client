@@ -17,7 +17,7 @@
   </style>
 </head>
 <body>
-<header>Welcome <span data-bind="text: username">...</span></header>
+<header>Welcome <input data-bind="value: username" value="guest"><button data-bind="click: login">Login</button></header>
 <section id="topbar">
   <input type="text" data-placeholder="Search for..." data-bind="value: latestSearch"/><button>Go</button>
   <p>[search bar w. suggestions (populated w. search terms)]</p>

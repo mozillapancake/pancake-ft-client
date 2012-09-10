@@ -92,19 +92,25 @@ define([
         //  deal out the parts of the response to the right tables in the store
         //  store updates should fire events at any affected listeners/resultsets
         resp.forEach(function(item, i, ar){
+          var thumbnail_key; 
           if(item.matches){
-            item.matches.forEach(function(site){
+            item.matches.forEach(function(site, idx){
               // decorate object with a flag
               site.meta_type_site = true;
               site.meta_response_time = timestamp;
               dataStore.put(site);
+              if(!thumbnail_key && site.thumbnail_key) {
+                // use the thumbnail_key from the first site for the stack
+                thumbnail_key = site.thumbnail_key;
+              }
             });
           }
           if(item.stack) {
             item = item.stack;
             item.meta_type_top_rated = true;
             item.meta_response_time = timestamp;
-            console.log("top_rated result %s of %s", i, ar.length, item);
+            item.thumbnail_key = thumbnail_key || '';
+            console.log("top_rated result %s of %s", i, ar.length, item, item.thumbnail_key);
             dataStore.put(item);
             console.log("/top_rated result");
           }

@@ -15,25 +15,27 @@ define([
   var app = window.app = Compose.create(Page, {
     el: 'body'
   });
+
   // page has a lifecycle: initialize, assign store, applyBindings
-  
   window.services = services; 
   window.settings = settings; 
   
   function thumbnail(key) {
-    return function(){
-      console.log("building thumnail url for ", key);
-      return settings.thumbnailUrl().replace('{thumbnail_key}', key);
-    };
+    console.log("building thumnail url for ", key);
+    return settings.thumbnailUrl().replace('{thumbnail_key}', key);
   }
   var viewModel = app.viewModel = {
+    login: function(){
+      console.log("TODO: actually login");
+    },
     latestSearch:   ko.observable(''),
     // savedSearches:  services.search.savedSearches(),
     topRated:    ko.observableArray([]).extend({
       wireTo: services.search.topRated,
       composeWith: [function(values){
         return values.map(function(entry){
-          entry.imgUrl = '';
+          entry.imgUrl = entry.thumbnail_key ? thumbnail(entry.thumbnail_key) : '';
+          console.log("Composing viewModel entry: ", entry, entry.imgUrl);
           return entry;
         });
       }]
