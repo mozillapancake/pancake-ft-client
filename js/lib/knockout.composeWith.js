@@ -45,11 +45,10 @@ define(['lang', 'knockout'], function(util, ko){
       
       var results = composedHandler(unwrapped);
       placeholder(results);
-      return results;
     }
 
     // get the initial values in the placeholder
-    placeholder(onTargetChange( target() ));
+    onTargetChange( target() );
     // hook into future changes
     target.subscribe(onTargetChange);
     
