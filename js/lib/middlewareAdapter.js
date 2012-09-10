@@ -5,7 +5,7 @@ define(['promise'], function(Promise){
     var afters = [];
     var adapted = function() {
       var callArgs = Array.prototype.slice.call(arguments);
-      console.log("Adapted called with: ", callArgs);
+      // console.log("Adapted called with: ", callArgs);
       var resultValue; // initial return value is undefined
       var proceed = true;
       var i;
@@ -22,7 +22,7 @@ define(['promise'], function(Promise){
       };
       var onResult = function(res){
         resultValue = res;
-        console.log("originalFn gave back: ", resultValue);
+        // console.log("originalFn gave back: ", resultValue);
         for(i=0; proceed && i<afters.length; i++) {
           fn = afters[i];
           proceed = false;
@@ -37,10 +37,10 @@ define(['promise'], function(Promise){
         fn(callArgs, resultValue, next);
       }
       if(proceed) {
-        console.log("calling originalFn with callArgs: ", callArgs);
+        // console.log("calling originalFn with callArgs: ", callArgs);
         resultValue = originalFn.apply(ctx || null, callArgs);
         if('function' === typeof resultValue.then) {
-          console.log("originalFunction returned a promise");
+          // console.log("originalFunction returned a promise");
           var defd = Promise.defer(); // return our own promise
           var promisedResult = resultValue;
           resultValue = undef;
@@ -55,11 +55,11 @@ define(['promise'], function(Promise){
           });
           return defd.promise;
         } else {
-          console.log("returning non-promised result: ", resultValue);
+          // console.log("returning non-promised result: ", resultValue);
           return onResult(resultValue);
         }
       }
-      console.log("no after-filters, returning result: ", resultValue);
+      // console.log("no after-filters, returning result: ", resultValue);
       return resultValue;
     };
     

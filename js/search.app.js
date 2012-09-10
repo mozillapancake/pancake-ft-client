@@ -5,6 +5,8 @@ define([
   'lib/page', 
   'services/settings', 
   'services/search', 
+  // knockout extensions
+  'lib/knockout.wireTo',
   'lib/knockout.composeWith'
 ], function($, ko, Compose, Page, settings, services){
   console.log("search.app loaded");
@@ -27,24 +29,9 @@ define([
   var viewModel = app.viewModel = {
     latestSearch:   ko.observable(''),
     // savedSearches:  services.search.savedSearches(),
-    topRated:    services.search.topRated().extend({ 
-      composeWith: [
-      // compose object with: 
-      // title => stack.title
-      // imgUrl => thumbnail(matches[0].thumbnailKey)
-        // logger('name field'), 
-        function(values) {
-          return values.map(function(entry){
-            console.log("composing stack viewModel: ", entry);
-            return {
-              title: entry.stack.title,
-              imgUrl: ko.computed(thumbnail(entry.matches[0].thumbnail_key))
-            };
-          });
-        }
-      ] 
-    }),
-    
+    topRated:    ko.observableArray([]).extend({
+      wireTo: services.search.topRated
+    }), 
     // theirResults:   services.search.theirResults(),
     // webResults:     services.search.webResults(),
     username:       settings.username

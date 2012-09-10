@@ -33,15 +33,15 @@ define(['knockout', 'lang', 'store', 'lib/LsCacheStorage'], function(ko, lang, s
   }
 
   // initial population of the settings from the query result
-  allSettings().forEach(updateEntry);
+  allSettings.forEach(updateEntry);
 
-  // get notification of any changes
-  allSettings.subscribe(function(settings, details){
-    console.log("query update, ", entries, details);
-    if(details && details.object) {
-      updateEntry(details.object);
+  allSettings.observe(function(entry, fromIndex, toIndex){
+    if(toIndex === -1){
+      // setting removed
+      entry.value = undef;
     }
-  });
+    updateEntry(details.object);
+  }, true);
 
   // function onStorage(evt){
   //   console.log("Storage event: ", evt);

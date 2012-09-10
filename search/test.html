@@ -5,17 +5,18 @@
 </head>
 <body>
   <div id="container">
-    <header data-bind="text: name"></header>
+    <header></header>
     <section>
-      <p># ancestors: <span data-bind="text: ancestorsCount">-</span></p>
+      <span data-bind="visible: !boards().length">No results</span>
+      <ul data-bind="foreach: boards, visible: boards().length">
+        <li data-bind="attr: { 'data-itemid': id }, click: $parent.onaction"><span data-bind="text: title"></span>  <span data-action="remove" class="remove">X</span></li>
+      </ul>
     </section>
   </div>
 
 <script src="../js/config.js"></script>
 <script src="../js/vendor/requirejs.js?v={{v}}"></script>
 <script>
-  config.appName = "main";
-  console.log("bootstrapping for platform: ", config.platform, config);
   require({
     // configure our AMD loader
     baseUrl: '../js',
@@ -23,101 +24,91 @@
     paths: config.paths,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
-  }, ['lang', 'promise'], function(lang, Promise){
+  }, ['knockout', 'EventEmitter', 'store', 'promise'], function(ko, EventEmitter, Store, Promise){
 
-    function chain(){
-      var defd = Promise.defer(), 
-          promise = defd.promise;
-      var handlers = Array.prototype.slice.call(arguments), 
-          pair; 
-      var onerror = function(err){
-        console.log("onError: ", err);
-      };
-
-      var promise = handlers.reduce(function(promise, pair){
-        return promise.then(pair[0] || passthru, pair[1] || onerror);
-      }, defd.promise);
-
-      // while((fn = handlers.shift())){
-      //   promise = promise.then(fn);
-      // }
-      return defd;
+    store = Store.Observable(new Store.Memory({
+      data: [
+        { title: "Board one", type_board: true },
+        { title: "Board two", type_board: true },
+        { title: "Bob", type_board: false, type_user: true, expires: Date.now()+5000 }
+      ].map(function(item){
+        if(!item.id) item.id = Math.random();
+        return item;
+      })
+      
+    }));
+    
+    function createStream(options){
+      var stream = new EventEmitter(); 
+      console.log("Created stream with options: ", options);
+      return stream;
     }
-    
-    var defd = chain(
-      [function(alpha){
-        console.log("first: ", alpha);
-        return alpha + String.fromCharCode(1+alpha.charCodeAt(0));
-      }], 
-      [function(alpha){
-        console.log("2nd: ", alpha);
-        return alpha + String.fromCharCode(4+alpha.charCodeAt(0));
-      }], 
-      [function(alpha){
-        console.log("3rd: ", alpha);
-        console.log("Finally: ", alpha);
-      }]
-    );
-    
-    // setTimeout(function(){
-    //   defd.resolve("a");
-    // });
-    
-    var stack = [];
-    function use(testFn, handle){
-      // register a middleware for this kind of request
-      stack.push({ test: testFn, handle: handle });
-      return this; 
-    }
-    
-    fetch = function(options){
-      // go through the registered middleware and see which want to handle this reqeust
-      var defd = Promise.defer();
-      // pass request options through each matching handler
-      options = stack.reduce(function(req, layer){
-        if(layer.test(req)){
-          req = layer(req, defd.promise, next);
-        }
-        return options;
+    service = {};
+    service.boards = function(sink) {
+      // getter
+      var options = {};
+      var stream = service.boards.stream || (this.stream = createStream(options));
+      // attach one end to the provided sink
+      stream.addListener('data', sink.ondata);
+      // steam.on('pause', sink.onPause)
+      // steam.on('reset', sink.onReset)
+      
+      // and attach the other to the source
+      var results = store.query({ type_board: true });
+      Promise.when(results, function(data){
+          // Initial results came back for boards query
+          stream.emitEvent('data', [data, null]);
+      }, function(err){
+        stream.emitEvent('error', [err]);
       });
-      req.success = function(resp, status, xhr){
-        console.log("Ok, got ", resp, status, xhr);
-        def.resolve(resp, status, xhr);
-      };
-      req.error = function(xhr, status, err){
-        console.log("Not ok, got ", xhr, status, err);
-        def.reject(xhr, status, err);
-      };
-      
-      $.ajax(req);
-      return defd.promise;
-    }
-    function handle(req) {
-      // $.ajax = 
-    }
-      var resp = Promise.defer(), 
-          promise = defd.promise;
-          
-      var middlewares = Array.prototype.slice.call(arguments);
-      
-      // build a chain of functions that'll each get passed req, resp, next
-      // the composition is sync, though resolution will be async
+      results.observe(function(data, fromIndex, toIndex){
+        // update on type_board results
+        stream.emitEvent('data', [data, {
+          fromIndex: fromIndex, 
+          toIndex: toIndex
+        }]);
+      }, true);
+      return stream;
+    };
 
-      // req -> req -> req 
-      // 
-      // resp <-- resp <-- resp
-      var handler = function(req) {
-        var fns = Array.prototype.slice.call(middlewares);
-        var next = function next(){
-          var handle = fns.shift();
-          handle(req, resp, next);
-        }
-        return next();
-      }
-      return handler;
-    }
-    var 
-
+    viewModel = {
+      onaction: function(item, evt){
+        var action = evt.originalTarget.getAttribute('data-action');
+        var id = item.id;
+        console.log("remove: ", action, id);
+        store.remove(id);
+      },
+      boards: ko.observableArray().extend({ 
+        wireTo: service.boards
+      })
+    };
+    
+    // var boardsSink = {
+    //   ondata: function(data, details){
+    //     // update viewmodel from data event
+    //     if(this.paused) return;
+    //     console.log("data event from boardsStream: ", data, details);
+    //     // simplest case""
+    //     viewModel.boards.removeAll();
+    //     // one at a time: 
+    //     // data.forEach(function(item){
+    //     //   viewModel.boards.push(item);
+    //     // });
+    //     // or in batch:
+    //     var spliceArgs = [0, 0].concat(data); 
+    //     console.log("Calling splice with args: ", spliceArgs);
+    //     viewModel.boards.splice.apply(viewModel.boards, spliceArgs);
+    //   },
+    //   pause: function(){
+    //     this.paused = true;
+    //   },
+    //   resume: function(){
+    //     this.paused = false;
+    //   }
+    // };
+    // var boardsStream = service.boards(boardsSink);
+    // 
+    ko.applyBindings(viewModel);
   });
 </script>
 

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pancake: Tester</title>
+</head>
+<body>
+  <div id="container">
+    <header data-bind="text: name"></header>
+    <section>
+      <p># ancestors: <span data-bind="text: ancestorsCount">-</span></p>
+    </section>
+  </div>
+
+<script src="../js/config.js"></script>
+<script src="../js/vendor/requirejs.js?v={{v}}"></script>
+<script>
+  config.appName = "main";
+  console.log("bootstrapping for platform: ", config.platform, config);
+  require({
+    // configure our AMD loader
+    baseUrl: '../js',
+    packages: config.packages,
+    paths: config.paths,
+    waitSeconds: 20,
+    urlArgs: "r={{v}}" // r is a cache-busting token
+  }, ['lang', 'promise'], function(lang, Promise){
+
+    function chain(){
+      var defd = Promise.defer(), 
+          promise = defd.promise;
+      var handlers = Array.prototype.slice.call(arguments), 
+          pair; 
+      var onerror = function(err){
+        console.log("onError: ", err);
+      };
+
+      var promise = handlers.reduce(function(promise, pair){
+        return promise.then(pair[0] || passthru, pair[1] || onerror);
+      }, defd.promise);
+
+      // while((fn = handlers.shift())){
+      //   promise = promise.then(fn);
+      // }
+      return defd;
+    }
+    
+    var defd = chain(
+      [function(alpha){
+        console.log("first: ", alpha);
+        return alpha + String.fromCharCode(1+alpha.charCodeAt(0));
+      }], 
+      [function(alpha){
+        console.log("2nd: ", alpha);
+        return alpha + String.fromCharCode(4+alpha.charCodeAt(0));
+      }], 
+      [function(alpha){
+        console.log("3rd: ", alpha);
+        console.log("Finally: ", alpha);
+      }]
+    );
+    
+    // setTimeout(function(){
+    //   defd.resolve("a");
+    // });
+    
+    var stack = [];
+    function use(testFn, handle){
+      // register a middleware for this kind of request
+      stack.push({ test: testFn, handle: handle });
+      return this; 
+    }
+    
+    fetch = function(options){
+      // go through the registered middleware and see which want to handle this reqeust
+      var defd = Promise.defer();
+      // pass request options through each matching handler
+      options = stack.reduce(function(req, layer){
+        if(layer.test(req)){
+          req = layer(req, defd.promise, next);
+        }
+        return options;
+      });
+      req.success = function(resp, status, xhr){
+        console.log("Ok, got ", resp, status, xhr);
+        def.resolve(resp, status, xhr);
+      };
+      req.error = function(xhr, status, err){
+        console.log("Not ok, got ", xhr, status, err);
+        def.reject(xhr, status, err);
+      };
+      
+      $.ajax(req);
+      return defd.promise;
+    }
+    function handle(req) {
+      // $.ajax = 
+    }
+      var resp = Promise.defer(), 
+          promise = defd.promise;
+          
+      var middlewares = Array.prototype.slice.call(arguments);
+      
+      // build a chain of functions that'll each get passed req, resp, next
+      // the composition is sync, though resolution will be async
+
+      // req -> req -> req 
+      // 
+      // resp <-- resp <-- resp
+      var handler = function(req) {
+        var fns = Array.prototype.slice.call(middlewares);
+        var next = function next(){
+          var handle = fns.shift();
+          handle(req, resp, next);
+        }
+        return next();
+      }
+      return handler;
+    }
+    var 
+
+  });
+</script>
+
+</body>
+</html>

@@ -1,12 +1,16 @@
 define([
   'dollar', 
   'compose', 
+  'promise', 
   'services/core', 
+  'services/settings',
   'knockout'
 ], function(
   $, 
-  Compose, 
+  Compose,
+  Promise, 
   services, 
+  settings,
   ko
 ){
 
@@ -32,86 +36,74 @@ define([
     };
   }
   
+  var dataStore = services; // for clarity, the services/core *is* our front-end data store
+  function onError(err) {
+    console.warn("Error: ", err);
+  }
+  
+  settings.username.subscribe(function(newName){
+    // username change, invalidates all/most of the records in our store
+    // get the new stuff
+    services.search.topRated({ refresh: true });
+  });
+  
   services.search = Compose.create(services.search || {}, {
-    topRated: function(options){
-      // could use lang.once to ensure this only gets called once
-      // - the query itself never changes, only range/post-processing options
-      // so we can create once and return the same result each subsequent call
-      var resultset = services.query({ type: 'top_rated' });
-      resultset.subscribe(function(items, details){
-        console.log("got topRated results: ", items, details);
-      });
-      settings.username.subscribe(function(newName){
-        console.log("username changed to "+newName+", need to resubmit the query");
-      });
-      return resultset;
-    },
-    yourResults: function(query, options){
+    topRated: function(sink, options){
       options = options || {};
-      var self = this;
-      var rows = options.rows || ko.observableArray([]);
+
+      // fashion a query for our store to get local results
+      // TODO: and, if we have a connection or if reset: true, request new results from server
       
-      // we return the observable array, but call splice on it with the results when the come back
-      // as its observable, it should result in updates to all listeners
-      // need to align ko observables with store observables
+      // return an event emitter
+      var stream = services.search.topRated.stream || (services.search.topRated.stream = services.createStream({
+        meta_type_top_rated: true
+      }));
+      // attach one end to the provided sink
+      stream.addListener('data', sink.ondata);
+      // maybe implement:
+      // steam.on('error', sink.onerror)
+      // steam.on('pause', sink.onpause)
+      // steam.on('resume', sink.resume)
       
-      // placeholder: the store will do this eventually, this method will just be sugar
+      // ...and attach the other end to the source
+      // fetch results from the server and populate the store
       $.ajax({
-        url: '/search/byuser',
-        cache: false,
-        type: 'GET',
-        success: successHandler(rows),
-        error: function(err){
-          console.warn("Error fetching yourResults: ", err);
-        }
+        dataType: 'json',
+        envelope: 'd',
+        url: settings.applicationRoot() + settings.username() + '/stack/top_rated'
+      }).then(function(resp){
+        // top_rated gives us objects with: 
+        // { matches: [], stack: {} }
+        var timestamp = Date.now();
+
+        // process the response, 
+        //  deal out the parts of the response to the right tables in the store
+        //  store updates should fire events at any affected listeners/resultsets
+        resp.forEach(function(item, i, ar){
+          if(item.matches){
+            item.matches.forEach(function(site){
+              // decorate object with a flag
+              site.meta_type_site = true;
+              site.meta_response_time = timestamp;
+              dataStore.put(site);
+            });
+          }
+          if(item.stack) {
+            item = item.stack;
+            item.meta_type_top_rated = true;
+            item.meta_response_time = timestamp;
+            // imgUrl: ko.computed(thumbnail(entry.matches[0].thumbnail_key))
+            console.log("top_rated result %s of %s", i, ar.length, item);
+            dataStore.put(item);
+            console.log("/top_rated result");
+          }
+        });
+      }, function(err){
+        // send error to listeners
+        stream.emitEvent('error', err);
       });
-      
-      return rows;
-    }, 
-    theirResults: function(query, options){
-      options = options || {};
-      var self = this;
-      var rows = options.rows || ko.observableArray([]);
-      
-      // we return the observable array, but call splice on it with the results when the come back
-      // as its observable, it should result in updates to all listeners
-      // need to align ko observables with store observables
-      
-      $.ajax({
-        url: '/search/others',
-        cache: false,
-        type: 'GET',
-        success: successHandler(rows),
-        error: function(err){
-          console.warn("Error fetching theirResults: ", err);
-        }
-      });
-      
-      return rows;
-    },
-    webResults: function(query, options){
-      options = options || {};
-      var self = this;
-      var rows = options.rows || ko.observableArray([]);
-      
-      // we return the observable array, but call splice on it with the results when the come back
-      // as its observable, it should result in updates to all listeners
-      // need to align ko observables with store observables
-      
-      $.ajax({
-        url: '/search/web',
-        cache: false,
-        type: 'GET',
-        success: successHandler(rows),
-        error: function(err){
-          console.warn("Error fetching webResults: ", err);
-        }
-      });
-      
-      return rows;
-    },
-    savedSearches: function(){
-      return services.query({ type: 'search' });
+
+      return stream;
     }
   });
   

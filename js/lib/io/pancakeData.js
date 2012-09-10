@@ -9,7 +9,7 @@ define(['lib/url', 'services/settings'], function(Url, settings){
           req.url.indexOf('/pancake/') > -1
       )
     );
-    console.log("IsDataRequest? ", req.url, is);
+    // console.log("IsDataRequest? ", req.url, is);
     return is;
   };
   dataRequestAdapter.name = "dataRequestAdapter";
@@ -19,11 +19,12 @@ define(['lib/url', 'services/settings'], function(Url, settings){
     var req = args[0];
     // map store request urls to their proper lattice urls
     var url = Url.parse(req.url);
+    var newUrl;
     var query = url.query || {};
     console.log("dataRequestAdapter, request for: ", req);
     switch(query.type) {
       case 'user':
-        req.url = '/lattice/session/active';
+        newUrl = '/lattice/session/active';
         break;
       case 'top_rated': 
         url.path = ['',
@@ -33,7 +34,7 @@ define(['lib/url', 'services/settings'], function(Url, settings){
         ].join('/');
         console.log("top_rated url: ", url, url.toString());
         delete query.type;
-        req.url = url.toString();
+        newUrl = url.toString();
         req.envelope = 'd';
         break;
       case 'search': 
@@ -46,9 +47,13 @@ define(['lib/url', 'services/settings'], function(Url, settings){
         ].join('/');
         console.log("url: ", url, url.toString());
         delete query.type;
-        req.url = url.toString();
+        newUrl = url.toString();
         req.envelope = 'd';
         break;
+    }
+    if(newUrl) {
+      req.originalUrl = req.url;
+      req.url = newUrl;
     }
     next(args, res);
   }
@@ -56,16 +61,22 @@ define(['lib/url', 'services/settings'], function(Url, settings){
   function dataResponseAdapter(args, res, next){
     var req = args[0];
     // filter responses to  store requests
-    var url = Url.parse(req.url);
+    var url = Url.parse(req.originalUrl ||req.url);
     var query = url.query || {};
-    console.log("dataResponseAdapter, response to: ", req);
+    var results = res; 
+    console.log("query.type:", query.type, url);
     switch(query.type) {
       case 'user':
       case 'top_rated': 
       case 'search': 
+        results = res.map(function(entry){
+          entry.type = query.type;
+          return entry;
+        });
         break;
     }
-    next(args, res);
+    console.log("dataResponseAdapter, response to: ", req, results);
+    next(args, results);
   }
   dataResponseAdapter.name = "dataResponseAdapter";
   dataResponseAdapter.matcher = function(req){
