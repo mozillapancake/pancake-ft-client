@@ -2,7 +2,7 @@ define(["../lib/util", "promise"
 ], function(lang, Promise){
 
 //  module:
-//    store/util/QueryResults
+//    dojo/store/util/QueryResults
 //  summary:
 //    The module defines a query results wrapper
 

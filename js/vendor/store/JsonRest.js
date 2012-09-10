@@ -172,13 +172,13 @@ lang.mixin(JsonRest.prototype, {
 		var results = $.ajax({
 			type: "GET",
 			beforeSend: function(xhr){
-			  resultsXhr = xhr; // XMLHttpRequest object
+				resultsXhr = xhr; // XMLHttpRequest object
 			},
 			url: this.target + (query || ""),
 			dataType: "json",
 			headers: headers
 		});
-		console.log("JsonRest GET returned: ", results);
+
 		results.total = results.then(function(){
 			var range = (results.xhr || resultsXhr).getResponseHeader("Content-Range");
 			return range && (range = range.match(/\/(.*)/)) && +range[1];

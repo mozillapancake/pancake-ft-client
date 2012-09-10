@@ -1,12 +1,6 @@
-define([
-  './Cache', './LocalStorage', './Memory', './Observable', './JsonRest'
-], function(Cache, LocalStorage, Memory, Observable, JsonRest){
+define(['./Memory', './Observable'], function(Memory, Observable){
   return {
-    Cache: Cache,
-    LocalStorage: LocalStorage,
     Memory: Memory, 
-    Memory: Memory, 
-    Observable: Observable,
-    JsonRest: JsonRest
+    Observable: Observable
   };
 });

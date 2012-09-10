@@ -2,7 +2,7 @@ define(["./util/QueryResults", "./util/SimpleQueryEngine" /*=====, "./api/Store"
 function(QueryResults, SimpleQueryEngine, lang /*=====, Store =====*/) {
 
 //  module:
-//    store/Memory
+//    dojo/store/Memory
 //  summary:
 //    The module defines an in-memory object store.
 
@@ -11,7 +11,7 @@ function(QueryResults, SimpleQueryEngine, lang /*=====, Store =====*/) {
 function Memory(options){
 	// summary:
 	//		Creates a memory object store.
-	// options: store/Memory
+	// options: dojo/store/Memory
 	//		This provides any configuration information that will be mixed into the store.
 	// 		This should generally include the data property to provide the starting set of data.
 	for(var i in options){
