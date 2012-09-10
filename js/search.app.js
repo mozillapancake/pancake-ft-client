@@ -30,7 +30,13 @@ define([
     latestSearch:   ko.observable(''),
     // savedSearches:  services.search.savedSearches(),
     topRated:    ko.observableArray([]).extend({
-      wireTo: services.search.topRated
+      wireTo: services.search.topRated,
+      composeWith: [function(values){
+        return values.map(function(entry){
+          entry.imgUrl = '';
+          return entry;
+        });
+      }]
     }), 
     // theirResults:   services.search.theirResults(),
     // webResults:     services.search.webResults(),

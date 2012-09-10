@@ -92,7 +92,6 @@ define([
             item = item.stack;
             item.meta_type_top_rated = true;
             item.meta_response_time = timestamp;
-            // imgUrl: ko.computed(thumbnail(entry.matches[0].thumbnail_key))
             console.log("top_rated result %s of %s", i, ar.length, item);
             dataStore.put(item);
             console.log("/top_rated result");
