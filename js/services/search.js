@@ -1,5 +1,6 @@
 define([
   'dollar', 
+  'lang', 
   'compose', 
   'promise', 
   'services/core', 
@@ -7,6 +8,7 @@ define([
   'knockout'
 ], function(
   $, 
+  lang, 
   Compose,
   Promise, 
   services, 
@@ -44,9 +46,9 @@ define([
   settings.username.subscribe(function(newName){
     // username change, invalidates all/most of the records in our store
     // get the new stuff
-    services.search.topRated({ refresh: true });
+    services.search.topRated(null, { refresh: true });
   });
-  
+
   services.search = Compose.create(services.search || {}, {
     topRated: function(sink, options){
       options = options || {};
@@ -55,23 +57,33 @@ define([
       // TODO: and, if we have a connection or if reset: true, request new results from server
       
       // return an event emitter
-      var stream = services.search.topRated.stream || (services.search.topRated.stream = services.createStream({
-        meta_type_top_rated: true
-      }));
-      // attach one end to the provided sink
-      stream.addListener('data', sink.ondata);
-      // maybe implement:
-      // steam.on('error', sink.onerror)
-      // steam.on('pause', sink.onpause)
-      // steam.on('resume', sink.resume)
-      
+      var stream = services.search.topRated.stream; 
+      if(!stream) {
+        stream = services.search.topRated.stream = services.createStream({
+          meta_type_top_rated: true
+        });
+      }
+      if(sink) {
+        // attach one end to the provided sink
+        stream.addListener('data', sink.ondata);
+        // maybe implement:
+        // steam.on('error', sink.onerror)
+        // steam.on('pause', sink.onpause)
+        // steam.on('resume', sink.resume)
+      }
+      if(options.refresh) {
+        options.cache = false; 
+        delete options.refresh;
+      }
       // ...and attach the other end to the source
       // fetch results from the server and populate the store
-      $.ajax({
+      options = lang.defaults(options, {
         dataType: 'json',
         envelope: 'd',
         url: settings.applicationRoot() + settings.username() + '/stack/top_rated'
-      }).then(function(resp){
+      });
+      
+      $.ajax(options).then(function(resp){
         // top_rated gives us objects with: 
         // { matches: [], stack: {} }
         var timestamp = Date.now();

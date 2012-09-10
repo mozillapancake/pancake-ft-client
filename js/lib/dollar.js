@@ -26,8 +26,8 @@ define(['zepto', 'promise'], function($, Promise){
     }
 
     options.success = function(data, status, xhr){
+      console.log("dollar success; got response data: ", data);
       var ret = defd.resolve.apply(defd, arguments);
-      console.log("dollar success; got return value: ", ret);
       return ret;
     };
     options.error = function(xhr, status, err){
