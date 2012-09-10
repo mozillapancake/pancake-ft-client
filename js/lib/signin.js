@@ -4,49 +4,58 @@
 
 define([
   'dollar',
-  'compose',
-  'lib/events', 
+  'lang',
+  'promise', 
   'verifiedemail'
-], function($, Compose, Evented, verifiedEmail ){
+], function($, lang, Promise, verifiedEmail ){
 
   var logger = {}; logger.log = logger.warn = logger.error = function(){};
   
   // TODO: Add evented mixin
-  var signin = Compose.create({
-    verifyAssertion: function(assertion) {
+  var signin = {
+    verifyAssertion: function(defd, assertion) {
+      var onSuccess = function(data){
+        logger.log("signin, verify success");
+        // browserid success response
+        if (data.success) {
+          defd.resolve(data);
+        } else {
+          logger.warn("browserid failure: ", data);
+          defd.reject(data);
+          //alert("BrowserID Verification Fail");
+        }
+      }; 
+      var onFailure = function(xhr, status, error) {
+        logger.log("signin, verify error");
+        defd.reject('error', error);
+        alert("Login error : " + status);
+      };
+      
       if (assertion) {
         $.ajax({
           url: "/browserid/verify",
           data: { 'assertion': assertion },
-          dataType: "json",
-          success: function(data, status, xhr) {
-            logger.log("signin, verify success");
-            // browserid success response
-            if (data.success) {
-              signin.trigger('verified', data);
-            } else {
-              logger.warn("browserid failure: ", data);
-              signin.trigger('error', data);
-              //alert("BrowserID Verification Fail");
-            }
-          },
-          error: function(xhr, status, error) {
-            logger.log("signin, verify error");
-            signin.trigger('error', error);
-            alert("Error login : " + status);
-          }
-        });
+          dataType: "json"
+        }).then(onSuccess, onFailure);
       } else {
-        logger.error("Unknown BrowserID failure");
-        signin.trigger('error', "Unknown BrowserID failure");
-        // something went wrong! The user isn't logged in.
-        // alert("BrowserID Failed. Not sure why.");
-      } 
+        // missing assertion
+        setTimeout(function(){
+          defd.reject("Signin cancelled");
+        }, 25);
+      }
+      return defd.promise;
     },
     fetch: function(){
-      verifiedEmail.fetch(signin.verifyAssertion);
+      // we'll give back a promised signin result
+      var defd = Promise.defer();
+      // wrap the verifyAssertion callback so we can pass it our deferred
+      var callback = lang.wrap(signin.verifyAssertion, function(handler, assertion){
+        return handler.call(null, defd, assertion);
+      });
+      verifiedEmail.fetch(callback);
+      return defd.promise;
     }
-  }, Evented);
+  };
 
   return signin;
 });

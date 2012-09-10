@@ -3,23 +3,26 @@ define([
   'knockout', 
   'compose', 
   'lib/page', 
+  'lib/signin', 
   'services/settings', 
   'services/search', 
   // knockout extensions
   'lib/knockout.wireTo',
   'lib/knockout.composeWith'
-], function($, ko, Compose, Page, settings, services){
+], function($, ko, Compose, Page, signin, settings, services){
   console.log("search.app loaded");
 
   // various views, aggregated onto one page
+  // page has a lifecycle: initialize, assign store, applyBindings
   var app = window.app = Compose.create(Page, {
     el: 'body'
   });
 
-  // page has a lifecycle: initialize, assign store, applyBindings
+  // expose some objects as globals for easier debug
   window.services = services; 
   window.settings = settings; 
-  
+  window.signin = signin; 
+
   function thumbnail(key) {
     console.log("building thumnail url for ", key);
     return settings.thumbnailUrl().replace('{thumbnail_key}', key);
@@ -27,6 +30,9 @@ define([
   var viewModel = app.viewModel = {
     login: function(){
       console.log("TODO: actually login");
+      signin.fetch().then(function(resp){
+        settings.username(resp.username);
+      });
     },
     latestSearch:   ko.observable(''),
     // savedSearches:  services.search.savedSearches(),
