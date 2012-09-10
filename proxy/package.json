@@ -1,0 +1,13 @@
+{
+  "name": "Pancake-FT-Reverse-Proxy",
+  "id": "Pancake-FT-Reverse-Proxy",
+  "version": "0.0.1",
+  "description": "Reverse proxying HTTP server for Pancake FT development",
+  "keywords": [],
+  "author": "Sam Foster <sfoster@mozilla.com>",
+  "scripts": {"start": "node server.js"},
+  "dependencies": {
+    "http-proxy": ">= 0.8.2",
+    "express": "3.x"
+  }
+}
