@@ -27,7 +27,8 @@ var config = {
     'json': './lib/json',
     'text': './vendor/plugin/text',
     'lscache': './vendor/lscache',
-    'zepto': './vendor/zepto'
+    'zepto': './vendor/zepto',
+    'EventEmitter': './vendor/EventEmitter'
   },
   packages: [
     // package mappings
