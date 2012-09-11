@@ -3,75 +3,28 @@ define([
   'knockout', 
   'compose', 
   'lib/page', 
-  'lib/signin', 
   'services/settings', 
   'services/search', 
   // knockout extensions
   'lib/knockout.wireTo',
   'lib/knockout.composeWith'
-], function($, ko, Compose, Page, signin, settings, services){
+], function($, ko, Compose, Page, settings, services){
   console.log("search.app loaded");
 
-  // various views, aggregated onto one page
-  // page has a lifecycle: initialize, assign store, applyBindings
+  window.services = services; 
+
+  // page has a lifecycle: initialize, applyBindings
   var app = window.app = Compose.create(Page, {
     el: 'body'
   });
 
-  // expose some objects as globals for easier debug
-  window.services = services; 
-  window.settings = settings; 
-  window.signin = signin; 
-
-  function thumbnail(key) {
-    console.log("building thumnail url for ", key);
-    return settings.thumbnailUrl().replace('{thumbnail_key}', key);
-  }
-  var viewModel = app.viewModel = {
-    settings: settings,
-    errorMessage: ko.observable(''),
-    // ------------------
-    // candidates for shared page viewModel prototype
-    loginFailure: function(msg){
-      console.log("Login failure: ", msg);
-      settings.session('');
-      viewModel.errorMessage(msg.message || msg);
-    },
-    loginLabel: ko.computed(function(){
-      return settings.session() ? 'Logout' : 'Login';
-    }),
-    login: function(){
-      // toggle for logged-in-ness
-      if(settings.session()){
-        // we have a session, so log out
-        settings.username('guest');
-        settings.session('');
-      } else {
-        // verify the username first, 
-        // then get a session token from our api
-        var verifiedUsername = '';
-        signin.verify().then(function(resp){
-          verifiedUsername = resp.username;
-        }).then(function(){
-          if(!verifiedUsername) return;
-
-          signin.session().then(function(userSession){
-            // only update the username property when its confirmed
-            settings.username(userSession.username);
-            // setting the session property should cascade a series of events
-            // as it invalidates any resultsets
-            settings.session(userSession.csrf_token);
-          }, function(xhr, status, err){
-            var msg = err || xhr.responseText;
-            viewModel.loginFailure(msg);
-          });
-        });
-      }
-    },
-    //
-    // ------------------
+  var thumbnail = Page.ViewModel.thumbnail;
+  
+  var viewModel = app.viewModel = Compose.create(Page.ViewModel, {
+    parent: app, // give the viewModel a reference to its owner
     
     latestSearch:   ko.observable(''),
+
     // savedSearches:  services.search.savedSearches(),
     topRated:    ko.observableArray([]).extend({
       wireTo: services.search.topRated,
@@ -82,13 +35,10 @@ define([
           return entry;
         });
       }]
-    }), 
+    })
     // theirResults:   services.search.theirResults(),
     // webResults:     services.search.webResults(),
-    username:       settings.username
-  };
-  
-  
+  });
   
   viewModel.latestSearch.subscribe(function(terms){
     console.log("latest search:", terms);

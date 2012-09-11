@@ -35,7 +35,7 @@
 </head>
 <body>
 <header>Welcome 
-  <span class="username" data-bind="text: username, css: { loggedin: !!settings.session() } " value="guest"></span>
+  <span class="username" data-bind="text: settings.username, css: { loggedin: !!settings.session() } " value="guest"></span>
   <span class="status"></span>
   <button data-bind="click: login, text: loginLabel">Login</button>
 </header>
