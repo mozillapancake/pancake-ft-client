@@ -4,6 +4,7 @@ var app = express();
 var httpProxy = require('http-proxy');
 
 var docRoot = path.join(__dirname, '..');
+var httpPort = 3000;
 
 app.use(app.router);
 app.use(express['static']( docRoot ));
@@ -15,6 +16,7 @@ app.use(express.directory( docRoot ));
 var proxy = new httpProxy.RoutingProxy();
 
 app.all('/user/*', function (req, res) {
+  console.log("User " +req.method+ " request for " + req.url);
   // forward user-api requests
   proxy.proxyRequest(req, res, {
     host: 'localhost',
@@ -24,6 +26,7 @@ app.all('/user/*', function (req, res) {
 
 app.all('/browserid/*', function (req, res) {
   // forward browserid requests
+  console.log("Browserid " +req.method+ " request for " + req.url);
   proxy.proxyRequest(req, res, {
     host: 'localhost',
     port: 6543
@@ -39,7 +42,16 @@ app.all('/lattice/*', function (req, res) {
   });
 });
 
-app.listen(3000);
+app.all('/api/*', function (req, res) {
+  // forward lattice graph api requests
+  console.log("API " +req.method+ " request for " + req.url);
+  proxy.proxyRequest(req, res, {
+    host: 'localhost',
+    port: 6543
+  });
+});
+
+app.listen(httpPort);
 console.log("Serving out of " + docRoot);
-console.log("Listening on localhost:3000");
+console.log("Listening on localhost:" + httpPort);
 
