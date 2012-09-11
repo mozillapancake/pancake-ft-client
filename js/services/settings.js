@@ -2,7 +2,8 @@ define(['knockout', 'lang', 'store', 'lib/LsCacheStorage'], function(ko, lang, s
   
   var undef;
   var defaultSettings = {
-    username: "guest"
+    username: "guest",
+    session: ""
   };
   
   var idPrefix = (config && config.localStorageIdPrefix) || 'pancake/';

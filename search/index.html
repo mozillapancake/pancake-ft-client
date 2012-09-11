@@ -14,13 +14,33 @@
   </script>
   <style>
     body { margin: 1em; }
+    .username.loggedin { 
+      background-color: #cfb;
+      color: #006;
+      font-weight: bold;
+      font-style: normal;
+    }
+    .username { 
+      display: inline-block;
+      padding: 2px;
+      color: #666;
+      font-style: italic;
+    }
+    #errorbar {
+      background: #fcc;
+      border: 1px solid #c00;
+      padding: 10px;
+    }
   </style>
 </head>
 <body>
 <header>Welcome 
-  <span data-bind="text: username" value="guest"></span>
+  <span class="username" data-bind="text: username, css: { loggedin: !!settings.session() } " value="guest"></span>
+  <span class="status"></span>
   <button data-bind="click: login">Login</button>
 </header>
+<section id="errorbar" data-bind="visible: errorMessage().length, text: errorMessage" style="display:none">
+</section>
 <section id="topbar">
   <input type="text" data-placeholder="Search for..." data-bind="value: latestSearch"/><button>Go</button>
   <p>[search bar w. suggestions (populated w. search terms)]</p>

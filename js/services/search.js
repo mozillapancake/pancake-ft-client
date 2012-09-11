@@ -43,8 +43,8 @@ define([
     console.warn("Error: ", err);
   }
   
-  settings.username.subscribe(function(newName){
-    // username change, invalidates all/most of the records in our store
+  settings.session.subscribe(function(newName){
+    // session/username change, invalidates all/most of the records in our store
     // get the new stuff
     services.search.topRated(null, { refresh: true });
   });
@@ -110,7 +110,7 @@ define([
             item.meta_type_top_rated = true;
             item.meta_response_time = timestamp;
             item.thumbnail_key = thumbnail_key || '';
-            console.log("top_rated result %s of %s", i, ar.length, item, item.thumbnail_key);
+            // console.log("top_rated result %s of %s", i, ar.length, item, item.thumbnail_key);
             dataStore.put(item);
             console.log("/top_rated result");
           }

@@ -28,12 +28,39 @@ define([
     return settings.thumbnailUrl().replace('{thumbnail_key}', key);
   }
   var viewModel = app.viewModel = {
+    settings: settings,
+    errorMessage: ko.observable(''),
+    // ------------------
+    // candidates for shared page viewModel prototype
+    loginFailure: function(msg){
+      console.log("Login failure: ", msg);
+      settings.session('');
+      viewModel.errorMessage(msg.message || msg);
+    },
     login: function(){
-      console.log("TODO: actually login");
-      signin.fetch().then(function(resp){
-        settings.username(resp.username);
+      // verify the username first, 
+      // then get a session token from our api
+      var verifiedUsername = '';
+      signin.verify().then(function(resp){
+        verifiedUsername = resp.username;
+      }).then(function(){
+        if(!verifiedUsername) return;
+        
+        signin.session().then(function(userSession){
+          // only update the username property when its confirmed
+          settings.username(userSession.username);
+          // setting the session property should cascade a series of events
+          // as it invalidates any resultsets
+          settings.session(userSession.csrf_token);
+        }, function(xhr, status, err){
+          var msg = err || xhr.responseText;
+          viewModel.loginFailure(msg);
+        });
       });
     },
+    //
+    // ------------------
+    
     latestSearch:   ko.observable(''),
     // savedSearches:  services.search.savedSearches(),
     topRated:    ko.observableArray([]).extend({
@@ -41,7 +68,7 @@ define([
       composeWith: [function(values){
         return values.map(function(entry){
           entry.imgUrl = entry.thumbnail_key ? thumbnail(entry.thumbnail_key) : '';
-          console.log("Composing viewModel entry: ", entry, entry.imgUrl);
+          // console.log("Composing viewModel entry: ", entry, entry.imgUrl);
           return entry;
         });
       }]
