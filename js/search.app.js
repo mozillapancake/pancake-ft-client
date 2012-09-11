@@ -37,26 +37,36 @@ define([
       settings.session('');
       viewModel.errorMessage(msg.message || msg);
     },
+    loginLabel: ko.computed(function(){
+      return settings.session() ? 'Logout' : 'Login';
+    }),
     login: function(){
-      // verify the username first, 
-      // then get a session token from our api
-      var verifiedUsername = '';
-      signin.verify().then(function(resp){
-        verifiedUsername = resp.username;
-      }).then(function(){
-        if(!verifiedUsername) return;
-        
-        signin.session().then(function(userSession){
-          // only update the username property when its confirmed
-          settings.username(userSession.username);
-          // setting the session property should cascade a series of events
-          // as it invalidates any resultsets
-          settings.session(userSession.csrf_token);
-        }, function(xhr, status, err){
-          var msg = err || xhr.responseText;
-          viewModel.loginFailure(msg);
+      // toggle for logged-in-ness
+      if(settings.session()){
+        // we have a session, so log out
+        settings.username('guest');
+        settings.session('');
+      } else {
+        // verify the username first, 
+        // then get a session token from our api
+        var verifiedUsername = '';
+        signin.verify().then(function(resp){
+          verifiedUsername = resp.username;
+        }).then(function(){
+          if(!verifiedUsername) return;
+
+          signin.session().then(function(userSession){
+            // only update the username property when its confirmed
+            settings.username(userSession.username);
+            // setting the session property should cascade a series of events
+            // as it invalidates any resultsets
+            settings.session(userSession.csrf_token);
+          }, function(xhr, status, err){
+            var msg = err || xhr.responseText;
+            viewModel.loginFailure(msg);
+          });
         });
-      });
+      }
     },
     //
     // ------------------
