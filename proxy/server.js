@@ -1,8 +1,9 @@
 var express = require('express');
+var path = require('path');
 var app = express();
 var httpProxy = require('http-proxy');
 
-var docRoot = process.cwd();
+var docRoot = path.join(__dirname, '..');
 
 app.use(app.router);
 app.use(express['static']( docRoot ));
