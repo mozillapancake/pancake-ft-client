@@ -33,7 +33,7 @@ define([
       
       if (assertion) {
         $.ajax({
-          url: "/browserid/verify",
+          url: settings.applicationRoot() + "browserid/verify",
           data: { 'assertion': assertion },
           dataType: "json"
         }).then(onSuccess, onFailure);
@@ -45,8 +45,8 @@ define([
       }
       return defd.promise;
     },
-    fetch: function(){
-      // we'll give back a promised signin result
+    verify: function(){
+      // we'll give back a promised authorization result
       var defd = Promise.defer();
       // wrap the verifyAssertion callback so we can pass it our deferred
       var callback = lang.wrap(signin.verifyAssertion, function(handler, assertion){
@@ -54,6 +54,12 @@ define([
       });
       verifiedEmail.fetch(callback);
       return defd.promise;
+    },
+    session: function(username) {
+      return $.ajax({
+        url: settings.applicationRoot() + "api/session",
+        dataType: "json"
+      });
     }
   };
 
