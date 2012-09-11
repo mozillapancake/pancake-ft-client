@@ -4,7 +4,7 @@ define([
   'compose', 
   'services/core', 
   'services/settings', 
-  'lib/signin', 
+  'services/signin', 
   'promise', 
   'knockout', 
   'knockout/mapping'

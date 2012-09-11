@@ -1,4 +1,4 @@
-define(['compose', 'knockout', 'services/settings', 'lib/signin'], function(Compose, ko, settings, signin){
+define(['compose', 'knockout', 'services/settings', 'services/signin'], function(Compose, ko, settings, signin){
 
   // expose some objects as globals for easier debug
   window.settings = settings; 

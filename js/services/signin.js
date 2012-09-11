@@ -6,13 +6,15 @@ define([
   'dollar',
   'lang',
   'promise', 
+  'services/core', 
+  'services/settings',
   'verifiedemail'
-], function($, lang, Promise, verifiedEmail ){
+], function($, lang, Promise, services, settings, verifiedEmail ){
 
   var logger = {}; logger.log = logger.warn = logger.error = function(){};
   
   // TODO: Add evented mixin
-  var signin = {
+  var signin = settings.signin = {
     verifyAssertion: function(defd, assertion) {
       var onSuccess = function(data){
         logger.log("signin, verify success");
