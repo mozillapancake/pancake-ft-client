@@ -29,7 +29,6 @@ define(['lang', 'knockout'], function(util, ko){
             // insert it
             underlyingArray.splice(details.toIndex, 1, data);
           }
-          console.log("underlying array: ", underlyingArray);
           target.valueHasMutated();
         } else {
           // simplest case handling: remove everything, inject the new
@@ -37,6 +36,9 @@ define(['lang', 'knockout'], function(util, ko){
           var spliceArgs = [0, 0].concat(data); 
           target.splice.apply(target, spliceArgs);
         }
+      },
+      onerror: function(err){
+        console.warn("Error passed to event sink: ", err);
       },
       pause: function(){
         this.paused = true;
@@ -47,7 +49,7 @@ define(['lang', 'knockout'], function(util, ko){
     };
     method(eventSink);
     return target;
-  }
+  };
 
   return ko.extenders.wireTo;
-})
+});
