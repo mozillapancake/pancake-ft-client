@@ -51,6 +51,15 @@ app.all('/api/*', function (req, res) {
   });
 });
 
+app.all('/search/:provider', function (req, res) {
+  // forward lattice graph api requests
+  console.log("API " +req.method+ " request for " + req.url);
+  proxy.proxyRequest(req, res, {
+    host: 'localhost',
+    port: 6543
+  });
+});
+
 app.listen(httpPort);
 console.log("Serving out of " + docRoot);
 console.log("Listening on localhost:" + httpPort);
