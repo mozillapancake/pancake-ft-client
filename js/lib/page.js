@@ -78,7 +78,6 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
 
   // helpers for viewmodel
   Page.ViewModel.thumbnail = function thumbnail(key) {
-    console.log("building thumnail url for ", key);
     return settings.thumbnailUrl().replace('{thumbnail_key}', key);
   }
 

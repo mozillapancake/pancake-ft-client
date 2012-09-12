@@ -31,17 +31,18 @@ define([
       composeWith: [function(values){
         return values.map(function(entry){
           entry.imgUrl = entry.thumbnail_key ? thumbnail(entry.thumbnail_key) : '';
-          // console.log("Composing viewModel entry: ", entry, entry.imgUrl);
           return entry;
         });
       }]
+    }),
+    webResults:    ko.observableArray([]).extend({
+      wireTo: services.search.webResults
     })
-    // theirResults:   services.search.theirResults(),
-    // webResults:     services.search.webResults(),
   });
   
   viewModel.latestSearch.subscribe(function(terms){
     console.log("latest search:", terms);
+    services.search.webResults(null, { terms: terms });
   });
   app.applyBindings(viewModel);
   

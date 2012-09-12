@@ -5,7 +5,8 @@ define([
   'promise', 
   'services/core', 
   'services/settings',
-  'knockout'
+  'knockout',
+  'EventEmitter'
 ], function(
   $, 
   lang, 
@@ -13,7 +14,8 @@ define([
   Promise, 
   services, 
   settings,
-  ko
+  ko,
+  EventEmitter
 ){
 
   function dataToViewModel(data){
@@ -121,8 +123,66 @@ define([
       });
 
       return stream;
+    },
+    webResults: function(sink, options){
+      options = options || {};
+      // make a search, results are *not* put in the store just yet
+      var results = [];
+
+      // return an event emitter
+      var stream = services.search.webResults.stream; 
+      if(!stream) {
+        stream = services.search.webResults.stream = new EventEmitter(); 
+      }
+      if(sink) {
+        // attach one end to the provided sink
+        stream.addListener('data', sink.ondata);
+        // maybe implement:
+        // steam.on('error', sink.onerror)
+        // steam.on('pause', sink.onpause)
+        // steam.on('resume', sink.resume)
+      }
+      // flush out existing results
+      stream.emitEvent('data', [results, null]);
+      
+      var terms = options.terms; 
+      delete options.terms;
+      
+      options = lang.defaults(options, {
+        dataType: 'json',
+        envelope: 'd',
+        data: {
+          format: 'json',
+          q: terms || 'cheese',
+          envelope: 'd'
+        },
+        url: settings.applicationRoot() + 'search/bing'
+      });
+      console.log("webResults request with options: ", options);
+      $.ajax(options).then(function(resp){
+        var timestamp = Date.now();
+
+        // process the response, 
+        //  store updates should fire events at any affected listeners/resultsets
+        results = resp.map(function(site, i, ar){
+          // decorate object with a flag
+          site.meta_type_site = true;
+          site.meta_response_time = timestamp;
+          // normalize a bit
+          site.title = site.place_title;
+          site.url = site.place_url;
+          delete site.place_title;
+          delete site.place_url;
+          return site;
+        });
+        stream.emitEvent('data', [results, null]);
+      }, function(err){
+        // send error to listeners
+        stream.emitEvent('error', err);
+      });
     }
   });
   
+
   return services;
 });

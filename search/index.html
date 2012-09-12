@@ -56,6 +56,15 @@
   </ul>
 </section>
 
+<section id="top_rated_section">
+  <h1>Web Results</h1>
+  <p data-bind="visible: !webResults().length" style="display:none">No results</p>
+  <dl id="results_web" data-bind="foreach: webResults, visible: webResults().length">
+    <dt><a data-bind="attr: { href: url }, text: title"></a></dt>
+    <dd data-bind="text: summary"></dd>
+  </dl>
+</section>
+
 <nav id="sidebar">
   <ul>
     <li>[list]</li>
