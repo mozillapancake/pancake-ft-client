@@ -35,7 +35,8 @@ var config = {
     { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
     { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },
     { name: 'compose',  location: './vendor/compose',   main: 'compose' },
-    { name: 'promise',  location: './vendor/promised-io',   main: 'promise' }
+    { name: 'promise',  location: './vendor/promised-io',   main: 'promise' },
+    { name: 'pancake',  location: './pancake',   main: 'main' }
   ],
   // UTC timestamp 
   pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
