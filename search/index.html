@@ -47,7 +47,7 @@
 </section>
 <section id="top_rated_section">
   <h1>Top Rated</h1>
-  <ul id="results_top_rated" data-bind="foreach: topRated">
+  <ul id="results_top_rated" data-bind="foreach: topRated, click: resultClick">
     <li>
       <span data-bind="text: id"></span>:
       <span data-bind="text: title"></span>
@@ -59,10 +59,12 @@
 <section id="top_rated_section">
   <h1>Web Results</h1>
   <p data-bind="visible: !webResults().length" style="display:none">No results</p>
-  <dl id="results_web" data-bind="foreach: webResults, visible: webResults().length">
-    <dt><a data-bind="attr: { href: url }, text: title"></a></dt>
-    <dd data-bind="text: summary"></dd>
-  </dl>
+  <ul id="results_web" data-bind="foreach: webResults, visible: webResults().length, click: resultClick">
+    <li data-bind="classlist: types">
+      <h4><a data-bind="attr: { href: url }, text: title"></a></h4>
+      <p data-bind="text: summary"></p>
+    </li>
+  </ul>
 </section>
 
 <nav id="sidebar">

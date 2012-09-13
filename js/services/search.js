@@ -163,10 +163,12 @@ define([
         var timestamp = Date.now();
 
         // process the response, 
-        //  store updates should fire events at any affected listeners/resultsets
+        //  decorate the result object with some meta data, and normalize property names
         results = resp.map(function(site, i, ar){
           // decorate object with a flag
           site.meta_type_site = true;
+          site.meta_type_searchresult = true;
+          site.types=['searchresult', 'site', 'web'];
           site.meta_response_time = timestamp;
           // normalize a bit
           site.title = site.place_title;
