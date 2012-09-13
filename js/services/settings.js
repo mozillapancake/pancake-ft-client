@@ -1,5 +1,20 @@
-define(['lang', 'EventEmitter', 'compose', 'knockout', 'store', 'lscache', 'lib/LsCacheStorage'], function(lang, EventEmitter, Compose, ko, store, lscache, LocalStorage){
-  
+define([
+  'lang', 
+  'EventEmitter', 
+  'compose', 
+  'knockout', 
+  'store', 
+  'lscache', 
+  'lib/LsCacheStorage'],
+function(
+  lang, 
+  EventEmitter, 
+  Compose, 
+  ko, 
+  store, 
+  lscache, 
+  LocalStorage
+){
   var undef;
   var storedSettings = {
     username: "guest",
@@ -11,16 +26,14 @@ define(['lang', 'EventEmitter', 'compose', 'knockout', 'store', 'lscache', 'lib/
   var idPrefix = (config && config.localStorageIdPrefix) || 'pancake/';
   idPrefix += 'settings';
   
-  console.log("combined settings: ", combinedSettings);
-  
   var updateNotifier = new EventEmitter();
-  updateNotifier.addListener('change', function(key, value, oldValue){
-    // sync value with the storedSettings
-    settingsStore.put({
-      id: key, value: value
-    });
-    console.log("Observable setting value changed: ", key, value, oldValue);
-  });
+  // updateNotifier.addListener('change', function(key, value, oldValue){
+  //   // sync value with the storedSettings
+  //   settingsStore.put({
+  //     id: key, value: value
+  //   });
+  //   console.log("Observable setting value changed: ", key, value, oldValue);
+  // });
   
   // internal store to normalize setting value access
   //  some settings are localStorage-backed (see storedSettings), others not.
@@ -75,7 +88,7 @@ define(['lang', 'EventEmitter', 'compose', 'knockout', 'store', 'lscache', 'lib/
       }
       var initialValue = this.get(key);
       var observable = this[key] = ko.observable( initialValue );
-
+  
       var subscription = observable.subscribe(function(newValue){
         updateNotifier.emitEvent('change', [key, newValue, value]);
         // updateNotifier.emitEvent('change-'+key, [newValue, value]);
@@ -91,13 +104,27 @@ define(['lang', 'EventEmitter', 'compose', 'knockout', 'store', 'lscache', 'lib/
       this.registerSetting(key, value, {});
     }, this);
   });
-
+  
   function onStorage(evt){
     var sourceUrl = evt.url || evt.uri;
-    if(sourceUrl !== location.href) {
-      console.log("Storage event from elsewhere: ", evt, sourceUrl);
+    // is the event worthy of our attention? 
+    if(
+      // ignore unrelated keys
+       evt.key.indexOf( idPrefix) > -1 &&
+       evt.key.indexOf( '__lscachetest__') == -1 &&
+       // ignore metadata updates
+       evt.key.indexOf( '-cacheexpiration') == -1       && 
+       // lscache sets to null before setting actual value
+       evt.newValue !== null     
+    ) {
+      // trigger observable notifications for this value
+      console.log("Storage event from elsewhere: ", evt.key, evt.newValue, sourceUrl);
+      var observable = settingsStore[evt.key];
+      if(observable && observable.valueHasMutated) {
+        // FIXME: maybe distinguish somehow between event source in eventname?
+        observable(newValue);
+      }
     }
-    console.log("TODO: Handle storage event: ", evt, sourceUrl);
   }
   // 
   if (window.addEventListener) {
@@ -105,7 +132,7 @@ define(['lang', 'EventEmitter', 'compose', 'knockout', 'store', 'lscache', 'lib/
   } else {
     window.attachEvent("onstorage", onStorage);
   }
-  console.log("Created settings module: ", settingsStore);
+
   return settingsStore;
 
 });
