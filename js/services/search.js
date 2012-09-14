@@ -82,7 +82,7 @@ define([
       options = lang.defaults(options, {
         dataType: 'json',
         envelope: 'd',
-        url: settings.applicationRoot() + settings.username() + '/stack/top_rated'
+        url: settings.latticeRoot() +'/'+ settings.username() + '/stack/top_rated'
       });
       
       $.ajax(options).then(function(resp){

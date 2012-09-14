@@ -47,7 +47,8 @@
 </section>
 <section id="top_rated_section">
   <h1>Top Rated</h1>
-  <ul id="results_top_rated" data-bind="foreach: topRated, click: resultClick">
+  <p data-bind="visible: !topRated().length" style="display:none">No results for <span data-bind="text:settings.username"></span></p>
+  <ul id="results_top_rated" data-bind="foreach: topRated, visible: topRated().length, click: resultClick">
     <li data-bind="attr: {'data-itemid': id}">
       <span data-bind="text: id"></span>:
       <span data-bind="text: title"></span>
