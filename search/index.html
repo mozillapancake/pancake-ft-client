@@ -95,7 +95,6 @@
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
   }, ['bootstrap'], function(env){
-    console.log("Bootstrap finished, env:", env);
     require(['search.app']);
   });
 </script>

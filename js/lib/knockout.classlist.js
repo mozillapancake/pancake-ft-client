@@ -12,7 +12,6 @@ define(['knockout'], function(ko){
               element.classList.add(cls);
             }
           }
-          console.log(element.classList);
       }
   };
   

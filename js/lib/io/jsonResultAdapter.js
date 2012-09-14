@@ -11,7 +11,7 @@ define(['lib/url', 'promise'], function(Url, Promise){
           req.url.indexOf('/pancake/') > -1
       )
     );
-    console.log("isJsonResultRequest? ", req.url, is);
+    // console.log("isJsonResultRequest? ", req.url, is);
     return is;
   };
 

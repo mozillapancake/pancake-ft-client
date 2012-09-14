@@ -93,7 +93,7 @@ define([
         // process the response, 
         //  deal out the parts of the response to the right tables in the store
         //  store updates should fire events at any affected listeners/resultsets
-        resp.forEach(function(item, i, ar){
+        var items = resp.map(function(item, i, ar){
           var thumbnail_key; 
           if(item.matches){
             item.matches.forEach(function(site, idx){
@@ -113,10 +113,14 @@ define([
             item.meta_response_time = timestamp;
             item.thumbnail_key = thumbnail_key || '';
             // console.log("top_rated result %s of %s", i, ar.length, item, item.thumbnail_key);
-            dataStore.put(item);
-            console.log("/top_rated result");
           }
+          return item;
         });
+        // TODO: just trigger a single change for the batch of results
+        items.forEach(function(item){
+          dataStore.put(item);
+        });
+        
       }, function(err){
         // send error to listeners
         stream.emitEvent('error', err);

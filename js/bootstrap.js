@@ -17,8 +17,6 @@ define([
   // needsTokenAdapter
 ){
 
-  console.log("Bootstrap loading, env:", config);
-
   function extend(thing1, thing2){
     thing1 = thing1 || {}; 
     for(var key in thing2 || {}){
