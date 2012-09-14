@@ -96,7 +96,14 @@ define([
     }),
     webResults:    ko.observableArray([]).extend({
       wireTo: services.search.webResults
-    })
+    }),
+    login: function(){
+      if(settings.session()) {
+        app.logout();
+      } else {
+        app.login();
+      }
+    }
   });
   
   viewModel.latestSearch.subscribe(function(terms){

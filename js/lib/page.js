@@ -20,12 +20,12 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
       store = this.store = store;
       return this;
     },
-    login: function(){
+    logout: function(){
       // we have a session, so log out
       settings.username('guest');
       settings.session('');
     },
-    logout: function(){
+    login: function(){
       // verify the username first, 
       // then get a session token from our api
       var viewModel = this.viewModel;
