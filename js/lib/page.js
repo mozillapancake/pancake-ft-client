@@ -23,7 +23,7 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
     logout: function(){
       // we have a session, so log out
       settings.username('guest');
-      settings.session('');
+      settings.session(0);
     },
     login: function(){
       // verify the username first, 
@@ -50,7 +50,7 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
     // handler for login error/failure
     loginFailure: function(msg){
       console.log("Login failure: ", msg);
-      settings.session('');
+      settings.session(0);
       this.viewModel.errorMessage(msg.message || msg);
     }
   });
