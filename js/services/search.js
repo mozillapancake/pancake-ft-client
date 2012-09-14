@@ -179,6 +179,10 @@ define([
           site.url = site.place_url;
           delete site.place_title;
           delete site.place_url;
+          // ensure the model object has an id of some kind
+          if(!site.id) {
+            site.id = i;
+          }
           return site;
         });
         stream.emitEvent('data', [results, null]);

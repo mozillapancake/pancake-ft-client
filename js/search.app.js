@@ -51,10 +51,8 @@ define([
       }
       evt.preventDefault();
       var node = evt.target, 
-          itemNode = $(evt.target).closest('li')[0], 
+          itemNode = $(evt.target).closest('[data-itemid]')[0], 
           url = node.getAttribute('data-target') || node.getAttribute('href'); 
-
-      console.log("click with ", bindingContext, evt);
 
       // TODO: refactor out somewhere nice
       var classList = itemNode.classList; 
@@ -71,10 +69,7 @@ define([
           }
         });
       }
-      // ---
-      
-      // to log the click, we need to know: 
-      //  its id in the store
+      // go ahead and load the click target
       if(isApplicationRequest(url)){
         return Pancake.openApplicationView(url);
       } else {
@@ -110,7 +105,6 @@ define([
     console.log("latest search:", terms);
     services.search.webResults(null, { terms: terms });
   });
-  
   
   app.applyBindings(viewModel);
   
