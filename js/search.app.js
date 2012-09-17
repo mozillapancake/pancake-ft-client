@@ -1,5 +1,6 @@
 define([
   'dollar', 
+  'lang', 
   'knockout', 
   'compose',
   'pancake', 
@@ -12,7 +13,7 @@ define([
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, ko, Compose, Pancake, Page, Url, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, settings, services){
   console.log("search.app loaded");
 
   window.services = services; 
@@ -61,7 +62,7 @@ define([
         services.stack.createStackFromSearch({ 
           search: {
             url: settings.searchResults(), // TODO: need to build the url for this particular search
-            terms: viewModel.latestSearch()
+            terms: viewModel.searchTerms()
           },
           dest: {
             title: node.title || node.text,
@@ -77,7 +78,31 @@ define([
       }
     },
 
-    latestSearch:   ko.observable(''),
+    latestSearch:   ko.observable(''),  // real-time values
+    searchTerms: ko.observable(''),     // debounced, intentional value
+    // Define handlers for cut/paste actions, which may not fire the key-handling events
+    onsearchpaste: function (bindContext, evt) {
+      console.log("search input paste");
+      setTimeout(function(){
+        location.hash = '#search/'+evt.target.value;
+      },0);
+      return true;
+    },
+    onsearchcut: function (bindContext, evt) {
+      console.log("search input cut");
+      setTimeout(function(){
+        location.hash = '#search/'+evt.target.value;
+      },0);
+      return true;
+    },
+    // Define implicit handler for search box typing.
+    onsearchkeyup: function (bindContext, evt) {
+      if (evt.keyCode == 13) {
+        location.hash = '#search/'+evt.target.value;
+      } else {
+        viewModel.latestSearch( evt.target.value );
+      }
+    },
 
     // savedSearches:  services.search.savedSearches(),
     topRated:    ko.observableArray([]).extend({
@@ -101,10 +126,27 @@ define([
     }
   });
   
-  viewModel.latestSearch.subscribe(function(terms){
-    console.log("latest search:", terms);
+  viewModel.latestSearch.subscribe( lang.debounce(function(terms){
+      // de-bounce before setting terms on the viewModel
+    console.log("debounced latestSearch:", terms);
+    location.hash = '#search/'+terms;
+  }, 300));
+
+  viewModel.searchTerms.subscribe(function(terms){
     services.search.webResults(null, { terms: terms });
   });
+
+  // Routes (entry points) for the search page: 
+  app.router.map('#search/:terms').to(function(){
+    var terms = this.params.terms;
+    console.log("Search on terms: ", terms);
+    app.viewModel.searchTerms(terms);
+  });
+  app.router.root('');
+  app.router.rescue(function(){
+    console.log("no route match");
+  });  
+  app.router.listen();
   
   app.applyBindings(viewModel);
   
