@@ -3,7 +3,7 @@ var config = {
   thumbnailerStatus: "{{thumbnailer_status_url}}?job={jobId}",
   thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
   latticeRoot: "/lattice",
-  latticeUrl: "{latticeRoot}/{username}/{service}/{method}",
+  latticeUrl: "/lattice/{username}/{service}/{method}",
   // Set reference to index of app
   applicationRoot: "/",
   appVersion: "{{js_app_version}}",
