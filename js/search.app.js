@@ -139,6 +139,7 @@ define([
   // Routes (entry points) for the search page: 
   app.router.map('#search/:terms').to(function(){
     var terms = this.params.terms;
+    terms = decodeURIComponent("bob%20monkhouse");
     console.log("Search on terms: ", terms);
     app.viewModel.searchTerms(terms);
   });
