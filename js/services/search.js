@@ -148,48 +148,50 @@ define([
       }
       // flush out existing results
       stream.emitEvent('data', [results, null]);
-      
       var terms = options.terms; 
-      delete options.terms;
-      
-      options = lang.defaults(options, {
-        dataType: 'json',
-        envelope: 'd',
-        data: {
-          format: 'json',
-          q: terms || 'cheese',
-          envelope: 'd'
-        },
-        url: settings.applicationRoot() + 'search/bing'
-      });
-      console.log("webResults request with options: ", options);
-      $.ajax(options).then(function(resp){
-        var timestamp = Date.now();
+      if(terms) {
+        delete options.terms;
 
-        // process the response, 
-        //  decorate the result object with some meta data, and normalize property names
-        results = resp.map(function(site, i, ar){
-          // decorate object with a flag
-          site.meta_type_site = true;
-          site.meta_type_searchresult = true;
-          site.types=['searchresult', 'site', 'web'];
-          site.meta_response_time = timestamp;
-          // normalize a bit
-          site.title = site.place_title;
-          site.url = site.place_url;
-          delete site.place_title;
-          delete site.place_url;
-          // ensure the model object has an id of some kind
-          if(!site.id) {
-            site.id = i;
-          }
-          return site;
+        options = lang.defaults(options, {
+          dataType: 'json',
+          envelope: 'd',
+          data: {
+            format: 'json',
+            q: terms || 'cheese',
+            envelope: 'd'
+          },
+          url: settings.applicationRoot() + 'search/bing'
         });
-        stream.emitEvent('data', [results, null]);
-      }, function(err){
-        // send error to listeners
-        stream.emitEvent('error', err);
-      });
+        console.log("webResults request with options: ", options);
+        $.ajax(options).then(function(resp){
+          var timestamp = Date.now();
+
+          // process the response, 
+          //  decorate the result object with some meta data, and normalize property names
+          results = resp.map(function(site, i, ar){
+            // decorate object with a flag
+            site.meta_type_site = true;
+            site.meta_type_searchresult = true;
+            site.types=['searchresult', 'site', 'web'];
+            site.meta_response_time = timestamp;
+            // normalize a bit
+            site.title = site.place_title;
+            site.url = site.place_url;
+            delete site.place_title;
+            delete site.place_url;
+            // ensure the model object has an id of some kind
+            if(!site.id) {
+              site.id = i;
+            }
+            return site;
+          });
+          stream.emitEvent('data', [results, null]);
+        }, function(err){
+          // send error to listeners
+          stream.emitEvent('error', err);
+        });
+      }
+      
     }
   });
   
