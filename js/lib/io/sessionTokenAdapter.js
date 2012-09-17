@@ -1,20 +1,13 @@
 define([
-  'data!/api/session',
-],
-function(userSession){
+  'services/settings'
+], function(settings){
+  console.log("sessionTokenAdapter, settings.session: ", settings.session);
   
-  if(!(config)){
-    throw "No config global";
-  }
-  // mixin the user session properties into our shared global config
-  for(var key in userSession){
-    config[key] = userSession[key];
-  }
-
-  function needsTokenAdapter(req){
+  function sessionTokenAdapter(args, respData, next){
+    var req = args[0];
     var beforeSend = req.beforeSend;
-    req.beforeSend = function(xhr, settings){
-      xhr.setRequestHeader('X-XSRFToken', config.csrf_token);
+    req.beforeSend = function(xhr, options){
+      xhr.setRequestHeader('X-XSRFToken', settings.session());
       if(beforeSend) beforeSend.apply(this, arguments);
     };
     
@@ -27,19 +20,18 @@ function(userSession){
     if(asString && (/^\s*\{/).test(data)) {
       // frozen JSON data
       data = JSON.parse(data);
-      data.csrf_token = config.csrf_token;
+      data.csrf_token = settings.session();
       data = JSON.stringify(data);
     } else if(asString){
       if(data.length) data +='&';
-      data += 'csrf_token='+ encodeURIComponent(config.csrf_token);
+      data += 'csrf_token='+ encodeURIComponent(settings.session());
     } else {
-      data.csrf_token = config.csrf_token;
+      data.csrf_token = settings.session();
     }
     req.data = data;
     // 
     // ----
-    
-    this.callNext = true; // pass the request along the chain for the next handler
+    if(next) next(args, respData);
   }
 
   // match requests to intercept and inject csrf_token param
@@ -50,15 +42,15 @@ function(userSession){
               // yes for non-GET request to lattice apis
               req.type !== "GET" && 
               (
-                url.indexOf(config.apiRoot) === 0 ||
-                url.indexOf(config.latticeRoot) === 0
+                url.indexOf(settings.apiRoot()) === 0 ||
+                url.indexOf(settings.latticeRoot()) === 0
               )
         );
     return retValue;
   };
   
-  needsTokenAdapter.matcher = needsTokenRequest;
-  needsTokenAdapter.name = "needsTokenRequest";
-  return needsTokenAdapter;
+  sessionTokenAdapter.matcher = needsTokenRequest;
+  sessionTokenAdapter.name = "sessionTokenAdapter";
+  return sessionTokenAdapter;
   
 });
