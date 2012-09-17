@@ -45,12 +45,6 @@ define([
     console.warn("Error: ", err);
   }
   
-  settings.session.subscribe(function(newName){
-    // session/username change, invalidates all/most of the records in our store
-    // get the new stuff
-    services.search.topRated(null, { refresh: true });
-  });
-
   services.search = Compose.create(services.search || {}, {
     topRated: function(sink, options){
       options = options || {};
@@ -193,6 +187,7 @@ define([
       }
       
     }
+
   });
   
 

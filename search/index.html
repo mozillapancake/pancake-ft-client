@@ -45,6 +45,19 @@
   <input type="text" placeholder="Search for..." data-bind="value: latestSearch, event: { keyup: onsearchkeyup, paste: onsearchpaste, cut: onsearchcut }"/><button>Go</button>
   <p>[search bar w. suggestions (populated w. search terms)]</p>
 </section>
+
+<section id="active_stacks">
+  <h1>Active Stacks</h1>
+  <p data-bind="visible: !activeStacks().length" style="display:none">No results for <span data-bind="text:settings.username"></span></p>
+  <ul data-bind="foreach: activeStacks, visible: activeStacks().length, click: resultClick">
+    <li data-bind="attr: {'data-itemid': id}">
+      <span data-bind="text: id"></span>:
+      <span data-bind="text: title"></span>
+      <img src="" data-bind="attr: { src: imgUrl, alt:'Screenshot of '+title }"/>
+    </li>
+  </ul>
+</section>
+
 <section id="top_rated_section">
   <h1>Top Rated</h1>
   <p data-bind="visible: !topRated().length" style="display:none">No results for <span data-bind="text:settings.username"></span></p>

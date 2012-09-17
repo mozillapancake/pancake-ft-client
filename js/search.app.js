@@ -61,14 +61,10 @@ define([
       if(classList.contains('searchresult') && classList.contains('site')) {
         console.log("Web search result site clicked, send it off to services.stack.createStackFromSearch");
         services.stack.createStackFromSearch({ 
-          search: {
-            url: template.replace(settings.searchResults(), { terms: viewModel.searchTerms() }), // TODO: need to build the url for this particular search
-            terms: viewModel.searchTerms()
-          },
-          dest: {
-            title: node.title || node.text,
-            url: url
-          }
+          "search_url": template.replace(settings.searchResults(), { terms: viewModel.searchTerms() }),
+          "search_terms": viewModel.searchTerms(),
+          "place_url": url, 
+          "place_title" : node.title || node.text
         });
       }
       // go ahead and load the click target
@@ -98,6 +94,7 @@ define([
     },
     // Define implicit handler for search box typing.
     onsearchkeyup: function (bindContext, evt) {
+      console.log("keyup: ", evt.keyCode, evt.target.value);
       if (evt.keyCode == 13) {
         location.hash = '#search/'+evt.target.value;
       } else {
@@ -106,6 +103,15 @@ define([
     },
 
     // savedSearches:  services.search.savedSearches(),
+    activeStacks:    ko.observableArray([]).extend({
+      wireTo: services.stack.activeStacks,
+      composeWith: [function(values){
+        return values.map(function(entry){
+          entry.imgUrl = entry.thumbnail_key ? thumbnail(entry.thumbnail_key) : '';
+          return entry;
+        });
+      }]
+    }),
     topRated:    ko.observableArray([]).extend({
       wireTo: services.search.topRated,
       composeWith: [function(values){
@@ -137,10 +143,18 @@ define([
     services.search.webResults(null, { terms: terms });
   });
 
+  settings.session.subscribe(function(newName){
+    // session/username change, invalidates all/most of the records in our store
+    // get the new stuff
+    services.search.topRated(null, { refresh: true });
+    services.stack.activeStacks(null, { refresh: true });
+  });
+
+
   // Routes (entry points) for the search page: 
   app.router.map('#search/:terms').to(function(){
     var terms = this.params.terms;
-    terms = decodeURIComponent("bob%20monkhouse");
+    terms = decodeURIComponent(terms);
     console.log("Search on terms: ", terms);
     app.viewModel.searchTerms(terms);
   });
