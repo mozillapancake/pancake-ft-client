@@ -1,6 +1,7 @@
 define([
   'dollar', 
   'lang', 
+  'lib/template', 
   'pancake', 
   'lib/url', 
   'services/core', 
@@ -9,6 +10,7 @@ define([
 ], function(
   $, 
   lang,
+  template,
   Pancake,
   Url,
   services, 

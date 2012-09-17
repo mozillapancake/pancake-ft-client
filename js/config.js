@@ -9,7 +9,7 @@ var config = {
   appVersion: "{{js_app_version}}",
   apiRoot: "/api/", 
   searchRoot: "{{search_url}}",
-  searchResults: "http://"+ location.host +"/searchresult?query={?query?}&provider={provider}",
+  searchResults: "http://"+ location.host +"/search/#search/{?terms?}",
   logging: "{{logging}}",
   social: {
     twitter: {

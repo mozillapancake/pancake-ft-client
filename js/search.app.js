@@ -6,6 +6,7 @@ define([
   'pancake', 
   'lib/page',
   'lib/url',
+  'lib/template',
   'services/settings', 
   'services/search', 
   'services/stack', 
@@ -13,7 +14,7 @@ define([
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, lang, ko, Compose, Pancake, Page, Url, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
   console.log("search.app loaded");
 
   window.services = services; 
@@ -61,7 +62,7 @@ define([
         console.log("Web search result site clicked, send it off to services.stack.createStackFromSearch");
         services.stack.createStackFromSearch({ 
           search: {
-            url: settings.searchResults(), // TODO: need to build the url for this particular search
+            url: template.replace(settings.searchResults(), { terms: viewModel.searchTerms() }), // TODO: need to build the url for this particular search
             terms: viewModel.searchTerms()
           },
           dest: {
