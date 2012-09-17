@@ -1,4 +1,4 @@
-define(['compose', 'knockout', 'services/settings', 'services/signin'], function(Compose, ko, settings, signin){
+define(['compose', 'knockout', 'path', 'services/settings', 'services/signin'], function(Compose, ko, Path, settings, signin){
 
   // expose some objects as globals for easier debug
   window.settings = settings; 
@@ -10,6 +10,7 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
       
       return this;
     },
+    router: Path,
     applyBindings: function(viewModel){
       var selfNode = $(this.el)[0];
       ko.applyBindings(viewModel || this, selfNode);
@@ -79,7 +80,7 @@ define(['compose', 'knockout', 'services/settings', 'services/signin'], function
   // helpers for viewmodel
   Page.ViewModel.thumbnail = function thumbnail(key) {
     return settings.thumbnailUrl().replace('{thumbnail_key}', key);
-  }
+  };
 
   
   return Page;
