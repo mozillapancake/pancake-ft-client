@@ -27,7 +27,8 @@ var config = {
     'text': './vendor/plugin/text',
     'lscache': './vendor/lscache',
     'zepto': './vendor/zepto',
-    'EventEmitter': './vendor/EventEmitter'
+    'EventEmitter': './vendor/EventEmitter',
+    'path': './vendor/path'
   },
   packages: [
     // package mappings
