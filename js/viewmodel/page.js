@@ -16,7 +16,7 @@ define(['knockout', 'services/settings'], function(ko, settings){
       if(settings.session()){
         this.parent.logout();
       } else {
-        this.parent.logout();
+        this.parent.login();
       }
     }
   };
