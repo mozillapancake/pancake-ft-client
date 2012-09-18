@@ -3,8 +3,13 @@ define(["./lib/util", "promise" /*=====, "./api/Store" =====*/
 
 // module:
 //		store/Observable
-// summary:
-//		TODOC
+
+// shim for Dojo's array module
+var array = {
+  indexOf: function(ar, thing) {
+    return ar.indexOf(thing);
+  }
+};
 
 var Observable = function(/*Store*/ store){
 	// summary:
@@ -19,7 +24,7 @@ var Observable = function(/*Store*/ store){
 	//		Create a Memory store that returns an observable query, and then log some
 	//		information about that query.
 	//
-	//	|	var store = store.Observable(new store.Memory({
+	//	|	var store = Observable(new Memory({
 	//	|		data: [
 	//	|			{id: 1, name: "one", prime: false},
 	//	|			{id: 2, name: "two", even: true, prime: true},
@@ -39,7 +44,7 @@ var Observable = function(/*Store*/ store){
 	// a Comet driven store could directly call notify to notify observers when data has
 	// changed on the backend
 	// create a new instance
-	store = lang.create(store);
+	store = Object.create(store);
 	
 	store.notify = function(object, existingId){
 		revision++;
@@ -95,7 +100,7 @@ var Observable = function(/*Store*/ store){
 										removedFrom : // put back in the original slot so it doesn't move unless it needs to (relying on a stable sort below)
 										resultsArray.length;
 									resultsArray.splice(firstInsertedInto, 0, changed); // add the new item
-									insertedInto = queryExecutor(resultsArray).indexOf(changed); // sort it
+									insertedInto = array.indexOf(queryExecutor(resultsArray), changed); // sort it
 									// we now need to push the chagne back into the original results array
 									resultsArray.splice(firstInsertedInto, 1); // remove the inserted item from the previous index
 									
@@ -107,10 +112,17 @@ var Observable = function(/*Store*/ store){
 										resultsArray.splice(insertedInto, 0, changed); // and insert into the results array with the correct index
 									}
 								}
-							}else if(changed && !options.start){
+							}else if(changed){
 								// we don't have a queryEngine, so we can't provide any information
-								// about where it was inserted, but we can at least indicate a new object
-								insertedInto = removedFrom >= 0 ? removedFrom : (store.defaultIndex || 0);
+								// about where it was inserted or moved to. If it is an update, we leave it's position alone, other we at least indicate a new object
+								if(existingId !== undef){
+									// an update, keep the index the same
+									insertedInto = removedFrom;
+								}else if(!options.start){
+									// a new object
+									insertedInto = store.defaultIndex || 0;
+									resultsArray.splice(insertedInto, 0, changed);
+								}
 							}
 							if((removedFrom > -1 || insertedInto > -1) &&
 									(includeObjectUpdates || !queryExecutor || (removedFrom != insertedInto))){
@@ -126,12 +138,12 @@ var Observable = function(/*Store*/ store){
 				// TODO: Remove cancel in 2.0.
 				handle.remove = handle.cancel = function(){
 					// remove this listener
-					var index = listeners.indexOf(listener);
+					var index = array.indexOf(listeners, listener);
 					if(index > -1){ // check to make sure we haven't already called cancel
 						listeners.splice(index, 1);
 						if(!listeners.length){
 							// no more listeners, remove the query updater too
-							queryUpdaters.splice(queryUpdaters.indexOf(queryUpdater), 1);
+							queryUpdaters.splice(array.indexOf(queryUpdaters, queryUpdater), 1);
 						}
 					}
 				};
