@@ -7,7 +7,6 @@ define([
   'lib/page',
   'lib/url',
   'lib/template',
-  'viewmodel/searchbox',
   'services/settings', 
   'services/search', 
   'services/stack', 
@@ -15,7 +14,7 @@ define([
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, lang, ko, Compose, Pancake, Page, Url, template, SearchBox, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
   console.log("search.app loaded");
 
   window.services = services; 
@@ -40,7 +39,7 @@ define([
 
   // intercept link clicks and route them through the Pancake.* API methods
 
-  var viewModel = app.viewModel = Compose.create(Page.ViewModel, { searchbox: SearchBox }, {
+  var viewModel = app.viewModel = Compose.create(Page.ViewModel, {
     parent: app, // give the viewModel a reference to its owner
     
     resultClick: function(bindingContext, evt){
@@ -109,12 +108,6 @@ define([
     }
   });
   
-  viewModel.searchbox.value.subscribe( lang.debounce(function(terms){
-      // de-bounce before setting terms on the viewModel
-    console.log("debounced searchbox.value:", terms);
-    location.hash = '#search/'+terms;
-  }, 300));
-
   viewModel.searchTerms.subscribe(function(terms){
     services.search.webResults(null, { terms: terms });
   });
