@@ -131,13 +131,7 @@ define([
               // use the thumbnail_key from the first site for the stack
               thumbnail_key = site.thumbnail_key;
             }
-            storeItem = dataStore.get(item.active_page.id);
-            if(storeItem) {
-              lang.extend(storeItem, site);
-              dataStore.put(storeItem);
-            } else {
-              dataStore.add(site);
-            }
+            dataStore.addOrUpdate(site);
             delete item.active_page;
           }
           var stack = {
@@ -153,13 +147,7 @@ define([
             thumbnail_key: thumbnail_key
           };
           console.log("Adding active stack: ", stack);
-          storeItem = dataStore.get(stack.id);
-          if(storeItem) {
-            lang.extend(storeItem, stack);
-            dataStore.put(storeItem);
-          } else {
-            dataStore.add(stack);
-          }
+          dataStore.addOrUpdate(stack);
         });
         
       }, function(err){

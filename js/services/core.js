@@ -57,6 +57,19 @@ define([
     console.log("Created stream with query, options: ", query, options);
     return stream;
   };
+  
+  // convenience method to either update an existing item or add as new
+  observedStore.addOrUpdate = function(itemData){
+    var storeItem = this.get(itemData.id);
+    if(storeItem) {
+      lang.extend(storeItem, itemData);
+      this.put(storeItem);
+    } else {
+      this.add(itemData);
+    }
+    return storeItem;
+  };
+  
 
   // not sure we need the restStore? 
   // use a simple service model with api.foo = function(){} // getter, returns promise

@@ -94,7 +94,8 @@ define([
               // decorate object with a flag
               site.meta_type_site = true;
               site.meta_response_time = timestamp;
-              dataStore.put(site);
+              // update or add entry in the store
+              dataStore.addOrUpdate(site);
               if(!thumbnail_key && site.thumbnail_key) {
                 // use the thumbnail_key from the first site for the stack
                 thumbnail_key = site.thumbnail_key;
@@ -112,7 +113,8 @@ define([
         });
         // TODO: just trigger a single change for the batch of results
         items.forEach(function(item){
-          dataStore.put(item);
+          // update or add entry in the store
+          dataStore.addOrUpdate(item);
         });
         
       }, function(err){

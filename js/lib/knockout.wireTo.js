@@ -1,4 +1,4 @@
-define(['lang', 'knockout'], function(util, ko){
+define(['lang', 'knockout'], function(lang, ko){
 
   function isObservableArray(thing) {
     return (
@@ -14,7 +14,6 @@ define(['lang', 'knockout'], function(util, ko){
     var eventSink = {
       ondata: function(data, details){
         // update viewmodel from data event
-        // console.log("data event from stream: ", data, details);
         if(this.paused) return;
 
         var underlyingArray = target();
