@@ -5,14 +5,14 @@ define(['knockout'], function(ko){
     onsearchpaste: function (bindContext, evt) {
       console.log("search input paste");
       setTimeout(function(){
-        location.hash = '#search/'+evt.target.value;
+        searchBox.value( evt.target.value );
       },0);
       return true;
     },
     onsearchcut: function (bindContext, evt) {
       console.log("search input cut");
       setTimeout(function(){
-        location.hash = '#search/'+evt.target.value;
+        searchBox.value( evt.target.value );
       },0);
       return true;
     },
@@ -20,7 +20,6 @@ define(['knockout'], function(ko){
     onsearchkeyup: function (bindContext, evt) {
       console.log("keyup: ", evt.keyCode, evt.target.value);
       if (evt.keyCode == 13) {
-        location.hash = '#search/'+evt.target.value;
       } else {
         searchBox.value( evt.target.value );
       }
