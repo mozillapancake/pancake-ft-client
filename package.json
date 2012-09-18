@@ -10,26 +10,12 @@
     "url": "https://github.com/sfoster/pancake-ft-client",
     "web": "https://github.com/sfoster/pancake-ft-client"
   },
-  "volo-backup": {
-    "note": "Seems `volo add` doesn't like this layout scheme. If we can get the kinks out, then it will be as simple add `volo add -f` to pull in all the latest client-side dependencies. Until then, js/vendor is managed manually and checked into the repo",
-    "baseUrl": "js/vendor",
-    "amd": {},
-    "dependencies": {
-      "requirejs": "github:jrburke/requirejs/2.0.5",
-      "knockout/knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js",
-      "compose/compose": "github:kriszyp/compose/v0.2.2",
-      "store": "github:sfoster/amd-store/knockout-js",
-      "zepto": "github:madrobby/zepto/v0.8",
-      "lang/underscore": "http://underscorejs.org/underscore.js",
-      "knockout": "https://raw.github.com/sfoster/knockout/master/build/output/knockout-latest.amd.js"
-    }
-  },
   "volo": {
     "baseUrl": "js/vendor",
     "dependencies": {
       "knockout": "https://github.com/downloads/SteveSanderson/knockout/knockout-2.1.0.debug.js",
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
-      "store": "github:sfoster/amd-store/knockout-js",
+      "store": "github:sfoster/amd-store/master",
       "lscache": "github:pamelafox/lscache/master",
       "q": "github:kriskowal/q/v0.8.8",
       "dollar": "github:jquery/jquery/1.8.1",
