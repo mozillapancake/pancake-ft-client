@@ -7,6 +7,7 @@ define([
   'lib/page',
   'lib/url',
   'lib/template',
+  'viewmodel/searchbox',
   'services/settings', 
   'services/search', 
   'services/stack', 
@@ -14,7 +15,7 @@ define([
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, template, SearchBox, settings, services){
   console.log("search.app loaded");
 
   window.services = services; 
@@ -39,7 +40,7 @@ define([
 
   // intercept link clicks and route them through the Pancake.* API methods
 
-  var viewModel = app.viewModel = Compose.create(Page.ViewModel, {
+  var viewModel = app.viewModel = Compose.create(Page.ViewModel, { searchbox: SearchBox }, {
     parent: app, // give the viewModel a reference to its owner
     
     resultClick: function(bindingContext, evt){
@@ -75,32 +76,7 @@ define([
       }
     },
 
-    latestSearch:   ko.observable(''),  // real-time values
     searchTerms: ko.observable(''),     // debounced, intentional value
-    // Define handlers for cut/paste actions, which may not fire the key-handling events
-    onsearchpaste: function (bindContext, evt) {
-      console.log("search input paste");
-      setTimeout(function(){
-        location.hash = '#search/'+evt.target.value;
-      },0);
-      return true;
-    },
-    onsearchcut: function (bindContext, evt) {
-      console.log("search input cut");
-      setTimeout(function(){
-        location.hash = '#search/'+evt.target.value;
-      },0);
-      return true;
-    },
-    // Define implicit handler for search box typing.
-    onsearchkeyup: function (bindContext, evt) {
-      console.log("keyup: ", evt.keyCode, evt.target.value);
-      if (evt.keyCode == 13) {
-        location.hash = '#search/'+evt.target.value;
-      } else {
-        viewModel.latestSearch( evt.target.value );
-      }
-    },
 
     // savedSearches:  services.search.savedSearches(),
     activeStacks:    ko.observableArray([]).extend({
@@ -133,9 +109,9 @@ define([
     }
   });
   
-  viewModel.latestSearch.subscribe( lang.debounce(function(terms){
+  viewModel.searchbox.value.subscribe( lang.debounce(function(terms){
       // de-bounce before setting terms on the viewModel
-    console.log("debounced latestSearch:", terms);
+    console.log("debounced searchbox.value:", terms);
     location.hash = '#search/'+terms;
   }, 300));
 

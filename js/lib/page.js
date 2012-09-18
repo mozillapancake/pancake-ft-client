@@ -1,9 +1,8 @@
-define(['compose', 'knockout', 'path', 'services/settings', 'services/signin'], function(Compose, ko, Path, settings, signin){
+define(['compose', 'knockout', 'path', 'services/settings', 'services/signin', 'viewmodel/page'], function(Compose, ko, Path, settings, signin, pageViewModel){
 
   // expose some objects as globals for easier debug
   window.settings = settings; 
   window.signin = signin; 
-
 
   var Page = Compose(Compose, {
     initialize: function(options){
@@ -58,30 +57,7 @@ define(['compose', 'knockout', 'path', 'services/settings', 'services/signin'], 
 
   // ------------------
   // shared page viewModel prototype
-  Page.ViewModel = {
-    
-    // page-level error message property
-    errorMessage: ko.observable(''),
-
-    loginLabel: ko.computed(function(){
-      return settings.session() ? 'Logout' : 'Login';
-    }),
-    // event handler for login/out buttons
-    login: function(){
-      // toggle for logged-in-ness
-      if(settings.session()){
-        this.parent.logout();
-      } else {
-        this.parent.logout();
-      }
-    }
-  };
-
-  // helpers for viewmodel
-  Page.ViewModel.thumbnail = function thumbnail(key) {
-    return settings.thumbnailUrl().replace('{thumbnail_key}', key);
-  };
-
+  Page.ViewModel = pageViewModel;
   
   return Page;
 });

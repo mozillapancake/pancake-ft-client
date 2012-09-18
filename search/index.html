@@ -42,7 +42,7 @@
 <section id="errorbar" data-bind="visible: errorMessage().length, text: errorMessage" style="display:none">
 </section>
 <section id="topbar">
-  <input type="text" placeholder="Search for..." data-bind="value: latestSearch, event: { keyup: onsearchkeyup, paste: onsearchpaste, cut: onsearchcut }"/><button>Go</button>
+  <input type="text" placeholder="Search for..." data-bind="value: searchbox.value, event: { keyup: searchbox.onsearchkeyup, paste: searchbox.onsearchpaste, cut: searchbox.onsearchcut }"/><button>Go</button>
   <p>[search bar w. suggestions (populated w. search terms)]</p>
 </section>
 
