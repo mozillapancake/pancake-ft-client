@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+  <title>Pancake: Search Bar</title>
+  <!--link rel="apple-touch-icon" href="images/icon.png?v={{v}}"/ -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <script type="text/javascript">
+    // Replace `no-js` class with `js` class. Useful for preventing flash
+    // of unscripted content accessibly.
+    var h = document.getElementsByTagName('html')[0];
+    h.className = h.className.replace('no-js', 'js');
+  </script>
+  <style>
+    body { margin: 1em; }
+    .username.loggedin { 
+      background-color: #cfb;
+      color: #006;
+      font-weight: bold;
+      font-style: normal;
+    }
+    .username { 
+      display: inline-block;
+      padding: 2px;
+      color: #666;
+      font-style: italic;
+    }
+    #errorbar {
+      background: #fcc;
+      border: 1px solid #c00;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+<header>Welcome 
+  <span class="username" data-bind="text: settings.username, css: { loggedin: !!settings.session() } " value="guest"></span>
+  <span class="status"></span>
+  <button data-bind="click: login, text: loginLabel">Login</button>
+</header>
+<section id="errorbar" data-bind="visible: errorMessage().length, text: errorMessage" style="display:none">
+</section>
+<section id="topbar">
+  <input type="text" placeholder="Search for..." data-bind="value: searchbox.value, event: { keyup: searchbox.onsearchkeyup, paste: searchbox.onsearchpaste, cut: searchbox.onsearchcut }"/>
+  <button data-bind="click: go">Go</button>
+</section>
+
+<section id="suggestions" data-bind="visible: suggestions().length" style="display:none">
+  <p>[search bar w. suggestions (populated w. search terms)]</p>
+  <ul data-bind="foreach: suggestions, click: resultClick">
+    <li data-bind="text: title, attr: { href: url }"></li>
+  </ul>
+</section>
+<script src="../js/config.js"></script>
+<script src="../js/vendor/requirejs.js?v={{v}}"></script>
+<script>
+  config.appName = "main";
+  console.log("bootstrapping for platform: ", config.platform, config);
+  require({
+    // configure our AMD loader
+    baseUrl: '../js',
+    paths: config.paths,
+    packages: config.packages,
+    waitSeconds: 20,
+    urlArgs: "r={{v}}" // r is a cache-busting token
+  }, ['bootstrap'], function(env){
+    require(['searchbar.app']);
+  });
+</script>
+<script src="https://login.persona.org/include.orig.js" type="text/javascript"></script>
+</body>
+</html>
