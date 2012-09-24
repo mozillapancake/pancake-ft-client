@@ -85,20 +85,34 @@
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->
 
-<script src="../js/config.js"></script>
 <script src="../js/vendor/requirejs.js?v={{v}}"></script>
+<script src="../js/config.js"></script>
 <script>
-  config.appName = "main";
-  console.log("bootstrapping for platform: ", config.platform, config);
-  require({
+  config.appName = "search";
+  config.platform = 'browser';
+  
+  // platform-specific package mapping for the 'pancake' requirejs package
+  config.packages.push({ name: 'pancake',  location: './pancake',   main: config.platform });
+  // platform-specific package mapping for the 'verifiedemail' requirejs package
+  config.packages.push({ name: 'verifiedemail',  location: './lib',   main: 'verifiedemail.'+config.platform });
+  // platform-specific package mapping for the 'xmessage' requirejs package
+  config.packages.push({ name: 'xmessage',  location: './lib',   main: 'xmessage.'+config.platform });
+  // Use the browser logger in the browser environment.
+  config.packages.push({ name: 'logger',  location: './lib',   main: 'logger' });
+
+  require.config({
     // configure our AMD loader
     baseUrl: '../js',
     paths: config.paths,
     packages: config.packages,
     waitSeconds: 20,
     urlArgs: "r={{v}}" // r is a cache-busting token
+  });
+
+  console.log("bootstrapping for platform: ", config.platform, config);
+  require({
   }, ['bootstrap'], function(env){
-    require(['search.app']);
+    require([config.appName + '.app']);
   });
 </script>
 <script src="https://login.persona.org/include.orig.js" type="text/javascript"></script>

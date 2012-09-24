@@ -1,16 +1,16 @@
 // loader and application config
 var config = {
-  thumbnailerStatus: "{{thumbnailer_status_url}}?job={jobId}",
+  thumbnailerStatus: "?job={jobId}",
   thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
   latticeRoot: "/lattice",
   latticeUrl: "/lattice/{username}/{service}/{method}",
   // Set reference to index of app
   applicationRoot: "/",
-  appVersion: "{{js_app_version}}",
+  appVersion: "0.0.1",
   apiRoot: "/api/", 
-  searchRoot: "{{search_url}}",
+  searchRoot: "",
   searchResults: "http://"+ location.host +"/search/#search/{?terms?}",
-  logging: "{{logging}}",
+  logging: "dev",
   social: {
     twitter: {
       service_url: "http://twitter.com"
@@ -36,15 +36,8 @@ var config = {
     { name: 'lang',     location: './vendor/lang',      main: 'underscore' },
     { name: 'knockout', location: './vendor/knockout',  main: 'knockout' },
     { name: 'compose',  location: './vendor/compose',   main: 'compose' },
-    { name: 'promise',  location: './vendor/promised-io',   main: 'promise' },
-    { name: 'pancake',  location: './pancake',   main: 'main' }
+    { name: 'promise',  location: './vendor/promised-io',   main: 'promise' }
   ],
   // UTC timestamp 
   pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
 };
-// some browser shims
-config.platform = 'web';
-config.paths.verifiedemail = 'lib/verifiedemail.browser';
-config.paths.xmessage = 'lib/xmessage.browser';
-// Use the browser logger in the browser environment.
-config.paths.logger = 'lib/logger.browser';
