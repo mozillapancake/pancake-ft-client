@@ -64,15 +64,6 @@
 <script>
   config.appName = "searchbar";
   
-  // platform-specific package mapping for the 'pancake' requirejs package
-  config.packages.push({ name: 'pancake',  location: './pancake',   main: config.platform });
-  // platform-specific package mapping for the 'verifiedemail' requirejs package
-  config.packages.push({ name: 'verifiedemail',  location: './lib',   main: 'verifiedemail.'+config.platform });
-  // platform-specific package mapping for the 'xmessage' requirejs package
-  config.packages.push({ name: 'xmessage',  location: './lib',   main: 'xmessage.'+config.platform });
-  // Use the browser logger in the browser environment.
-  config.packages.push({ name: 'logger',  location: './lib',   main: 'logger' });
-
   require.config({
     // configure our AMD loader
     baseUrl: '../js',

@@ -1,5 +1,26 @@
+// some shims
+if(!console){
+  console = {};
+  console.log = console.warn = console.error = console.info = function(){};
+}
+if(!('device' in window)){
+  // shim Cordova WebView device api
+  window.device = {
+    name: '',
+    cordova: '',
+    platform: (/(iPhone|iPad|Android)/).exec(navigator.userAgent) ? RegExp.$1 : 'browser',
+    uuid: '',
+    version: ''
+  };
+}
+
 // loader and application config
 var config = {
+  // expose a platform category we can use to target different platforms/devices 
+  // TODO: this is crude logic and might need to be much finer-grained
+  platform: device.category || (/iPad|iPhone/).test(device.platform) ? 'ios' : device.platform.toLowerCase(),
+  
+  // application settings
   thumbnailerStatus: "?job={jobId}",
   thumbnailUrl: "http://s3.amazonaws.com/thumbnails-pancake-mozillalabs-com/{thumbnail_key}",
   latticeRoot: "/lattice",
@@ -21,6 +42,8 @@ var config = {
   },
   analyticsUrl: "/lattice/stats",
   exceptionsUrl: "/lattice/exceptions",
+
+  // loader settings
   paths: {
     'dollar': './lib/dollar',
     'json': './lib/json',
@@ -42,20 +65,13 @@ var config = {
   pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
 };
 
-// some shims
-if(!console){
-  console = {};
-  console.log = console.warn = console.error = console.info = function(){};
-}
-if(!('device' in window)){
-  // shim Cordova WebView device api
-  window.device = {
-    name: '',
-    cordova: '',
-    platform: (/(iPhone|iPad|Android)/).exec(navigator.userAgent) ? RegExp.$1 : 'browser',
-    uuid: '',
-    version: ''
-  };
-}
-// expose a platform category we can use to target different platforms/devices 
-config.platform = device.category || (/iPad|iPhone/).test(device.platform) ? 'ios' : device.platform.toLowerCase();
+
+// platform-specific package mapping for the 'pancake' requirejs package
+config.packages.push({ name: 'pancake',  location: './pancake',   main: config.platform });
+// platform-specific package mapping for the 'verifiedemail' requirejs package
+config.packages.push({ name: 'verifiedemail',  location: './lib',   main: 'verifiedemail.'+config.platform });
+// platform-specific package mapping for the 'xmessage' requirejs package
+config.packages.push({ name: 'xmessage',  location: './lib',   main: 'xmessage.'+config.platform });
+// Use the browser logger in the browser environment.
+config.packages.push({ name: 'logger',  location: './lib',   main: 'logger' });
+
