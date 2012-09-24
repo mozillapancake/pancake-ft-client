@@ -41,3 +41,21 @@ var config = {
   // UTC timestamp 
   pageLoadStartTime: Date.now()+(new Date().getTimezoneOffset()*60000)
 };
+
+// some shims
+if(!console){
+  console = {};
+  console.log = console.warn = console.error = console.info = function(){};
+}
+if(!('device' in window)){
+  // shim Cordova WebView device api
+  window.device = {
+    name: '',
+    cordova: '',
+    platform: (/(iPhone|iPad|Android)/).exec(navigator.userAgent) ? RegExp.$1 : 'browser',
+    uuid: '',
+    version: ''
+  };
+}
+// expose a platform category we can use to target different platforms/devices 
+config.platform = device.category || (/iPad|iPhone/).test(device.platform) ? 'ios' : device.platform.toLowerCase();
