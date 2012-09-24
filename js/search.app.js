@@ -15,7 +15,7 @@ define([
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
 ], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
-  console.log("search.app loaded");
+  Pancake.log("log", "searchbar.app loaded");
 
   window.services = services; 
 
@@ -69,9 +69,9 @@ define([
       }
       // go ahead and load the click target
       if(isApplicationRequest(url)){
-        return Pancake.openApplicationView(url);
+        return Pancake.openAppView(url);
       } else {
-        return Pancake.openPublicView(url);
+        return Pancake.openWebView(url);
       }
     },
 

@@ -16,7 +16,7 @@ define([
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
 ], function($, lang, ko, Compose, Pancake, Page, Url, template, PageViewModel, SearchBox, settings, services){
-  console.log("searchbar.app loaded");
+  Pancake.log("log", "searchbar.app loaded");
 
   window.services = services; 
 
@@ -29,7 +29,7 @@ define([
       return this;
     },
     loadSearch: function(terms) {
-      return Pancake.openApplicationView(settings.applicationRoot() + 'search/#search/'+ terms);
+      return Pancake.openAppView(settings.applicationRoot() + 'search/#search/'+ terms);
     }
   });
 
