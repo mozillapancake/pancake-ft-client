@@ -1,7 +1,10 @@
-window.FrenchToast = window.Pancake = {
+(function(define){
+define([], function(){
 
-    _sendToNative: function(name, arguments) {
-        var json = { destination: 'native', call: { name: name, arguments: arguments } };
+  var PancakeAPI = {
+
+    _sendToNative: function(name, args) {
+        var json = { destination: 'native', call: { 'name': name, 'arguments': args } };
         var body = JSON.stringify(json);
         var http = new XMLHttpRequest();
         http.open("POST", "http://localhost:1234/prefix/send", true);
@@ -17,6 +20,10 @@ window.FrenchToast = window.Pancake = {
 
     openWebView: function(url) {
         this._sendToNative('openWebView', [url]);
+    },
+
+    log: function(level, message) {
+      PancakeAPI._sendToNative(level, Array.prototype.slice.call(arguments, 1));
     },
 
     // The client can use this to register for layer focus events
@@ -49,5 +56,17 @@ window.FrenchToast = window.Pancake = {
         // This should make a call to the backend
         alert("Not implemented yet");
     }
+  };
+  // returning the export of the module
+  return PancakeAPI;
 
-};
+});
+})(typeof define != "undefined" ?
+  define: // AMD/RequireJS format if available
+  function(deps, factory){
+    if(typeof module !="undefined"){
+      module.exports = factory(); // CommonJS environment, like NodeJS
+    }else{
+      window.FrenchToast = window.Pancake = factory(); // raw script, assign to Pancake/FrenchToast global
+    }
+  });

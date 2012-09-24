@@ -4,7 +4,7 @@ define([], function(){
   var PancakeAPI = {
 
       _sendToNative: function(name, args) {
-        console.log("Not implemented", "_sendToNative", name, args);
+        alert("Not implemented yet");
       },
 
       openAppView: function(url) {
@@ -12,7 +12,6 @@ define([], function(){
       },
 
       openWebView: function(url) {
-        console.log("Open %s in public viewer", url);
         window.open(url, 'publicviewer');
       },
 
