@@ -17,7 +17,6 @@
       "lodash": "https://raw.github.com/bestiejs/lodash/master/lodash.js",
       "store": "github:sfoster/amd-store/master",
       "lscache": "github:pamelafox/lscache/master",
-      "q": "github:kriskowal/q/v0.8.8",
       "dollar": "github:jquery/jquery/1.8.1",
       "EventEmitter": "github:Wolfy87/EventEmitter/v4.0.0",
       "path": "https://raw.github.com/sfoster/pathjs/false-path-matches/path.js"
