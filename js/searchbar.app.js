@@ -4,6 +4,7 @@ define([
   'knockout', 
   'compose',
   'pancake', 
+  'lib/page',
   'lib/url',
   'lib/template',
   'viewmodel/page',
@@ -14,13 +15,13 @@ define([
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, lang, ko, Compose, Pancake, Url, template, PageViewModel, SearchBox, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, template, PageViewModel, SearchBox, settings, services){
   console.log("searchbar.app loaded");
 
   window.services = services; 
 
   // page has a lifecycle: initialize, applyBindings
-  var app = window.app = Compose.create({
+  var app = window.app = Compose.create(Page, {
     el: 'body',
     applyBindings: function(viewModel){
       var selfNode = $(this.el)[0];
