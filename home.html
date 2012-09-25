@@ -67,7 +67,6 @@
   <p data-bind="visible: !history.recent().length" style="display:none">No recent results for <span data-bind="text:settings.username"></span></p>
   <ul data-bind="foreach: history.recent, visible: history.recent().length, click: suggestionClick" style="display:none">
     <li data-bind="attr: {'data-itemid': id}">
-      <span data-bind="text: id"></span>:
       <span data-bind="text: title"></span>
     </li>
   </ul>

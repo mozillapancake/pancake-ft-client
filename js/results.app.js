@@ -61,7 +61,10 @@ define([
       
       // TODO: refactor out somewhere nice
       var classList = itemNode.classList; 
-      if(classList.contains('searchresult') && classList.contains('site')) {
+      if(
+          settings.session() && // don't try and create a new stack if we're not logged in
+          classList.contains('searchresult') && classList.contains('site')
+      ) {
         console.log("Web search result site clicked, send it off to services.stack.createStackFromSearch");
         services.stack.createStackFromSearch({ 
           "search_url": template.replace(settings.searchResults(), { terms: viewModel.searchTerms() }),
