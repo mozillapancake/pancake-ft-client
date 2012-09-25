@@ -9,13 +9,14 @@ define([
   'lib/template',
   'viewmodel/page',
   'viewmodel/searchbox',
+  'viewmodel/history',
   'services/settings', 
   'services/search', 
   // knockout extensions
   'lib/knockout.wireTo',
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
-], function($, lang, ko, Compose, Pancake, Page, Url, template, PageViewModel, SearchBox, settings, services){
+], function($, lang, ko, Compose, Pancake, Page, Url, template, PageViewModel, SearchBox, HistoryViewModel, settings, services){
   Pancake.log("log", "home.app loaded");
 
   window.services = services; 
@@ -36,13 +37,14 @@ define([
 
   var viewModel = app.viewModel = Compose.create(PageViewModel, { 
     searchbox: SearchBox,
+    history: HistoryViewModel,
     parent: app, // give the viewModel a reference to its owner
     
     settings: settings,
     
     suggestions: ko.observableArray([]),
     
-    resultClick: function(bindingContext, evt){
+    suggestionClick: function(bindingContext, evt){
       // handling for the typeahead search suggestions
       // intercept link clicks and route them through the Pancake.* API methods
       if(evt.altKey || evt.ctrlKey || evt.metaKey) {
@@ -57,8 +59,16 @@ define([
       var node = evt.target, 
           itemNode = $(evt.target).closest('li')[0], 
           terms = node.getAttribute('data-terms') || node.text || node.textContent || node.innerText; 
-      
-      app.loadSearch(terms);
+
+      // do the suggested search
+      viewModel.searchbox.value(terms);
+      app.loadSearch( terms );
+
+      // clear the suggestions list when we're done
+      setTimeout(function(){
+        var suggestions = app.viewModel.suggestions;
+        suggestions.splice(0, suggestions().length);
+      }, 100);
     },
     
     go: function(){
@@ -77,6 +87,8 @@ define([
       }
     }
   });
+  // wire up the submit stub method to our 'go' submitter
+  viewModel.searchbox.submit = viewModel.go;
   
   viewModel.searchbox.value.subscribe( lang.debounce(function(terms){
       // de-bounce before setting terms on the viewModel
@@ -85,7 +97,8 @@ define([
 
   settings.session.subscribe(function(sessionValue){
     // session/username change, invalidates all/most of the records in our store
-    console.log("new settings.session value:", sessionValue);
+    // get the new stuff
+    services.stack.activeStacks(null, { refresh: true });
   });
 
   app.applyBindings(viewModel);

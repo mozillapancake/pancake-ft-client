@@ -80,16 +80,6 @@ define([
 
     searchTerms: ko.observable(''),     // debounced, intentional value
 
-    // savedSearches:  services.search.savedSearches(),
-    activeStacks:    ko.observableArray([]).extend({
-      wireTo: services.stack.activeStacks,
-      composeWith: [function(values){
-        return values.map(function(entry){
-          entry.imgUrl = entry.thumbnail_key ? thumbnail(entry.thumbnail_key) : '';
-          return entry;
-        });
-      }]
-    }),
     topRated:    ko.observableArray([]).extend({
       wireTo: services.search.topRated,
       composeWith: [function(values){
@@ -119,7 +109,6 @@ define([
     // session/username change, invalidates all/most of the records in our store
     // get the new stuff
     services.search.topRated(null, { refresh: true });
-    services.stack.activeStacks(null, { refresh: true });
   });
 
 

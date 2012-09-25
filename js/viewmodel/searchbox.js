@@ -20,9 +20,13 @@ define(['knockout'], function(ko){
     onsearchkeyup: function (bindContext, evt) {
       console.log("keyup: ", evt.keyCode, evt.target.value);
       if (evt.keyCode == 13) {
+        searchBox.submit();
       } else {
         searchBox.value( evt.target.value );
       }
+    },
+    submit: function(){
+      // stub method
     }
   };
   return searchBox;

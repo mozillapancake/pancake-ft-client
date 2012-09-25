@@ -15,6 +15,7 @@
     var h = document.getElementsByTagName('html')[0];
     h.className = h.className.replace('no-js', 'js');
   </script>
+  <link rel="stylesheet" href="./css/grid.css" type="text/css" media="screen" title="no title" charset="utf-8">
   <style>
     body { margin: 1em; }
     .username.loggedin { 
@@ -37,24 +38,41 @@
   </style>
 </head>
 <body>
-<header>Welcome 
-  <span class="username" data-bind="text: settings.username, css: { loggedin: !!settings.session() } " value="guest"></span>
-  <span class="status"></span>
-  <button data-bind="click: login, text: loginLabel">Login</button>
-</header>
 <section id="errorbar" data-bind="visible: errorMessage().length, text: errorMessage" style="display:none">
+  <button data-bind="click: errorMessage('')">OK</button>
+</section>
+<section>
+</header>
+<section id="topbar">
+  <section id="suggestions" data-bind="visible: suggestions().length" style="display:none">
+    <p>[search bar w. suggestions (populated w. search terms)]</p>
+    <ul data-bind="foreach: suggestions, click: suggestionClick">
+      <li data-bind="attr: { 'data-itemid': $index }"><a data-bind="text: title, attr: { href: url }"></a></li>
+    </ul>
+  </section>
+  <div class="row">
+    <div class="col col-4of5">
+      <input type="text" placeholder="Search for..." data-bind="value: searchbox.value, event: { keyup: searchbox.onsearchkeyup, paste: searchbox.onsearchpaste, cut: searchbox.onsearchcut }"/>
+      <button data-bind="click: go">Go</button>
+    </div>
+    <div class="col col-1of5">
+      <div>
+        <span class="username" data-bind="text: settings.username, css: { loggedin: !!settings.session() } " value="guest"></span>
+        <button data-bind="click: login, text: loginLabel">Login</button>
+      </div>
+    </div>
+  </div>
 </section>
 <section id="topbar">
-  <input type="text" placeholder="Search for..." data-bind="value: searchbox.value, event: { keyup: searchbox.onsearchkeyup, paste: searchbox.onsearchpaste, cut: searchbox.onsearchcut }"/>
-  <button data-bind="click: go">Go</button>
-</section>
-
-<section id="suggestions" data-bind="visible: suggestions().length" style="display:none">
-  <p>[search bar w. suggestions (populated w. search terms)]</p>
-  <ul data-bind="foreach: suggestions, click: resultClick">
-    <li data-bind="text: title, attr: { href: url }"></li>
+  <p data-bind="visible: !history.recent().length" style="display:none">No recent results for <span data-bind="text:settings.username"></span></p>
+  <ul data-bind="foreach: history.recent, visible: history.recent().length, click: suggestionClick" style="display:none">
+    <li data-bind="attr: {'data-itemid': id}">
+      <span data-bind="text: id"></span>:
+      <span data-bind="text: title"></span>
+    </li>
   </ul>
 </section>
+
 <!-- This Source Code Form is subject to the terms of the Mozilla Public
    - License, v. 2.0. If a copy of the MPL was not distributed with this
    - file, You can obtain one at http://mozilla.org/MPL/2.0/.  -->

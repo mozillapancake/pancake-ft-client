@@ -48,17 +48,6 @@
   </ul>
 </section>
 
-<section id="active_stacks">
-  <h1>Active Stacks</h1>
-  <p data-bind="visible: !activeStacks().length" style="display:none">No results for <span data-bind="text:settings.username"></span></p>
-  <ul data-bind="foreach: activeStacks, visible: activeStacks().length, click: resultClick" style="display:none">
-    <li data-bind="attr: {'data-itemid': id}">
-      <span data-bind="text: id"></span>:
-      <span data-bind="text: title"></span>
-    </li>
-  </ul>
-</section>
-
 <section id="top_rated_section">
   <h1>Web Results</h1>
   <p data-bind="visible: !webResults().length" style="display:none">No results</p>
