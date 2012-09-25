@@ -15,7 +15,7 @@ define([
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
 ], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
-  Pancake.log("log", "search.app loaded");
+  Pancake.log("log", "results.app loaded");
 
   window.services = services; 
 

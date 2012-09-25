@@ -16,7 +16,7 @@ You may need to adjust hostnames and ports in ./proxy/server.js as required. To 
 cd ./proxy
 npm install
 npm start
-open http://localhost/search/
+open http://localhost/home.html
 ````
 
 Note, although the package.json includes some *volo* properties, no install or volo commands are necessary to run the FE piece; the repo includes copies of all 3rd party dependencies.

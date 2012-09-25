@@ -30,7 +30,7 @@ var config = {
   appVersion: "0.0.1",
   apiRoot: "/api/", 
   searchRoot: "",
-  searchResults: "http://"+ location.host +"/search/#search/{?terms?}",
+  searchResults: "http://"+ location.host +"/results.html#search/{?terms?}",
   logging: "dev",
   social: {
     twitter: {
