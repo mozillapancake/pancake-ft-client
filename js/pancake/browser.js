@@ -24,31 +24,34 @@ define([], function(){
 
       _layerFocusHandler: null,
 
-      registerLayerFocusHandler: function(fn) {
-          this._layerFocusHandler = fn;
-      },
-
       // This is called directly by the native code
 
       dispatchLayerFocusEvent: function(url) {
-          this._layerFocusHandler(url);
+        this._layerFocusHandler(url);
+      },
+
+      // Incoming message - called directly by the native code
+
+      handleCall: function(){
+        // MessageThing.handleCall
+        alert("handleCall: Not implemented yet");
       },
 
       // 'External'
 
       getSession: function() {
-          // This should make a call to the backend
-          alert("Not implemented yet");
+        // This should make a call to the backend
+        alert("getSession: Not implemented yet");
       },
 
       startBrowserId: function(cb) {
-          // This should make a call to the BrowserID code
-          alert("Not implemented yet");
+        // This should make a call to the BrowserID code
+        alert("startBrowserId: Not implemented yet");
       },
 
       validateBrowserIdReceipt: function(receipt, cb) {
-          // This should make a call to the backend
-          alert("Not implemented yet");
+        // This should make a call to the backend
+        alert("validateBrowserIdReceipt: Not implemented yet");
       }
 
   };
