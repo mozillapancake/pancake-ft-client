@@ -15,7 +15,7 @@ define([
   'lib/knockout.composeWith',
   'lib/knockout.classlist'
 ], function($, lang, ko, Compose, Pancake, Page, Url, template, settings, services){
-  Pancake.log("log", "searchbar.app loaded");
+  Pancake.log("log", "search.app loaded");
 
   window.services = services; 
 
@@ -56,6 +56,9 @@ define([
           itemNode = $(evt.target).closest('[data-itemid]')[0], 
           url = node.getAttribute('data-target') || node.getAttribute('href'); 
 
+      // make url absolute
+      url = Url.parse(location.href, url).toString();
+      
       // TODO: refactor out somewhere nice
       var classList = itemNode.classList; 
       if(classList.contains('searchresult') && classList.contains('site')) {
@@ -124,12 +127,12 @@ define([
   app.router.map('#search/:terms').to(function(){
     var terms = this.params.terms;
     terms = decodeURIComponent(terms);
-    console.log("Search on terms: ", terms);
+    Pancake.log("log", "search.app: Search on terms: " + terms);
     app.viewModel.searchTerms(terms);
   });
   app.router.root('');
   app.router.rescue(function(){
-    console.log("no route match");
+    Pancake.log("log", "search.app: no route match");
   });  
   app.router.listen();
   

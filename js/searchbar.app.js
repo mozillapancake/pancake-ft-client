@@ -29,7 +29,8 @@ define([
       return this;
     },
     loadSearch: function(terms) {
-      return Pancake.openAppView(settings.applicationRoot() + 'search/#search/'+ terms);
+      var url = Url.parse(location.href, settings.applicationRoot() + 'search/#search/'+ terms).toString();
+      return Pancake.openAppView(url);
     }
   });
 
