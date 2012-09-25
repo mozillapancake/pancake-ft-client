@@ -18,7 +18,7 @@ define(function(){
   var Url = function(url, baseUrl){
     if(typeof url === 'string'){
       this._url = url;
-      url = parse(url);
+      url = parse.apply(null, arguments);
     } 
     if(typeof url === 'object'){
       for(var i in url){
